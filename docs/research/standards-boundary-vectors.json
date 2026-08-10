@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "profile": "flashpatch-sdr-srgb-bt709-v1",
+  "source_claim_ids": [
+    "wcag22-general-flash-threshold",
+    "wcag22-red-flash-threshold",
+    "wcag22-threshold-vectors",
+    "itu-bt1702-flash-gate",
+    "itu-bt1702-pattern-gate",
+    "itu-bt1702-michelson-boundary-conflict",
+    "itu-bt709-luma-matrix-precision",
+    "iso-9241-391-spatial-stripe-hazard"
+  ],
+  "source_locators": {
+    "wcag22-general-flash-threshold": "WCAG 2.2 #dfn-general-flash-and-red-flash-thresholds",
+    "wcag22-red-flash-threshold": "Understanding SC 2.3.1, Field working definition for saturated red",
+    "wcag22-threshold-vectors": "WCAG 2.2 SC 2.3.1; G19 Tests Procedure; G176 Formula 1 and Tests Procedure",
+    "itu-bt1702-flash-gate": "ITU-R BT.1702-3 Annex 1 Guideline 1, printed pages 3 to 4",
+    "itu-bt1702-pattern-gate": "ITU-R BT.1702-3 Attachment 1 to Annex 1, printed page 6",
+    "itu-bt1702-michelson-boundary-conflict": "ITU-R BT.1702-3 Annex 1 Guideline 1 and Annex 2 Note 2",
+    "itu-bt709-luma-matrix-precision": "ITU-R BT.709-6 Part 2, Item 3, Table 3",
+    "iso-9241-391-spatial-stripe-hazard": "ISO 9241-391:2016 Section 5.4; ITU-R BT.1702-3 Attachment 1"
+  },
+  "vectors": [
+    {"id":"general-delta-below","operation":"general_flash_transition","input":{"first_luminance":0.2,"second_luminance":0.299},"expected":false,"source_claim_id":"wcag22-general-flash-threshold"},
+    {"id":"general-delta-at","operation":"general_flash_transition","input":{"first_luminance":0.2,"second_luminance":0.3},"expected":true,"source_claim_id":"wcag22-general-flash-threshold"},
+    {"id":"general-dark-at","operation":"general_flash_transition","input":{"first_luminance":0.8,"second_luminance":0.9},"expected":false,"source_claim_id":"wcag22-general-flash-threshold"},
+    {"id":"red-ratio-below","operation":"saturated_red_threshold","input":{"red_ratio":0.799,"chroma_distance":0.21},"expected":false,"source_claim_id":"wcag22-red-flash-threshold"},
+    {"id":"red-ratio-at","operation":"saturated_red_threshold","input":{"red_ratio":0.8,"chroma_distance":0.201},"expected":true,"source_claim_id":"wcag22-red-flash-threshold"},
+    {"id":"red-distance-at","operation":"saturated_red_threshold","input":{"red_ratio":0.8,"chroma_distance":0.2},"expected":false,"source_claim_id":"wcag22-red-flash-threshold"},
+    {"id":"area-21823","operation":"wcag_small_area_exemption","input":{"contiguous_pixels":21823},"expected":true,"source_claim_id":"wcag22-threshold-vectors"},
+    {"id":"area-21824","operation":"wcag_small_area_exemption","input":{"contiguous_pixels":21824},"expected":false,"source_claim_id":"wcag22-threshold-vectors"},
+    {"id":"frequency-three-closed-same-state","operation":"wcag_frequency_path","input":{"flash_count":3,"same_state_at_window_ends":true},"expected":true,"source_claim_id":"wcag22-threshold-vectors"},
+    {"id":"frequency-three-closed-different-state","operation":"wcag_frequency_path","input":{"flash_count":3,"same_state_at_window_ends":false},"expected":false,"source_claim_id":"wcag22-threshold-vectors"},
+    {"id":"frequency-four","operation":"wcag_frequency_path","input":{"flash_count":4,"same_state_at_window_ends":true},"expected":false,"source_claim_id":"wcag22-threshold-vectors"},
+    {"id":"itu-dark-below-delta-below","operation":"itu_luminance_transition","input":{"first_cd_m2":159.0,"second_cd_m2":178.999},"expected":false,"source_claim_id":"itu-bt1702-flash-gate"},
+    {"id":"itu-dark-below-delta-at","operation":"itu_luminance_transition","input":{"first_cd_m2":159.0,"second_cd_m2":179.0},"expected":true,"source_claim_id":"itu-bt1702-flash-gate"},
+    {"id":"itu-michelson-strict-at","operation":"itu_luminance_transition","input":{"first_cd_m2":160.0,"second_cd_m2":180.0,"michelson_inclusive":false},"expected":false,"source_claim_id":"itu-bt1702-michelson-boundary-conflict"},
+    {"id":"itu-michelson-inclusive-at","operation":"itu_luminance_transition","input":{"first_cd_m2":160.0,"second_cd_m2":180.0,"michelson_inclusive":true},"expected":true,"source_claim_id":"itu-bt1702-michelson-boundary-conflict"},
+    {"id":"pattern-five-pairs-dynamic-above-area","operation":"regular_pattern","input":{"stripe_pairs":5,"affected_fraction":0.26,"dynamic":true},"expected":false,"source_claim_id":"itu-bt1702-pattern-gate"},
+    {"id":"pattern-six-pairs-dynamic-at-area","operation":"regular_pattern","input":{"stripe_pairs":6,"affected_fraction":0.25,"dynamic":true},"expected":false,"source_claim_id":"itu-bt1702-pattern-gate"},
+    {"id":"pattern-six-pairs-dynamic-above-area","operation":"regular_pattern","input":{"stripe_pairs":6,"affected_fraction":0.251,"dynamic":true},"expected":true,"source_claim_id":"iso-9241-391-spatial-stripe-hazard"},
+    {"id":"pattern-six-pairs-static-at-area","operation":"regular_pattern","input":{"stripe_pairs":6,"affected_fraction":0.4,"dynamic":false},"expected":false,"source_claim_id":"itu-bt1702-pattern-gate"},
+    {"id":"pattern-six-pairs-static-above-area","operation":"regular_pattern","input":{"stripe_pairs":6,"affected_fraction":0.401,"dynamic":false},"expected":true,"source_claim_id":"itu-bt1702-pattern-gate"},
+    {"id":"pattern-smooth-flow-exempt","operation":"regular_pattern","input":{"stripe_pairs":6,"affected_fraction":1.0,"dynamic":true,"smooth_one_direction":true},"expected":false,"source_claim_id":"itu-bt1702-pattern-gate"},
+    {"id":"color-srgb-bt709","operation":"color_profile","input":{"profile":"bt709"},"expected":"srgb-bt709","source_claim_id":"itu-bt709-luma-matrix-precision"},
+    {"id":"color-bt601-rejected","operation":"color_profile","input":{"profile":"bt601"},"expected":"rejected","source_claim_id":"itu-bt709-luma-matrix-precision"}
+  ]
+}

@@ -1,0 +1,22 @@
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.venv/
+.tools/
+*.egg-info/
+build/
+dist/
+artifacts/
+uv.lock
+
+docs/research/2026-100-YEAR-GLOBAL-LIFE-PROBLEMS.md
+docs/research/2026-100-YEAR-GLOBAL-LIFE-PROBLEMS-v2.md
+scratch/
+# Protected untracked files
+.closure-artifacts/
+.looprun-active
+.ouroboros/
+keys/
+libpkgconf3_*.deb
+src/flashpatch/l9_claim.py
+scripts/

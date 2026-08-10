@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flashpatch"
+version = "0.1.0"
+description = "Fail-closed visual QA for Godot game projects."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+dependencies = ["av>=18", "numpy>=1.26", "opencv-python-headless>=4.10"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "setuptools>=69"]
+
+[project.scripts]
+flashpatch = "flashpatch.cli:main"
+
+[tool.setuptools]
+license-files = ["LICENSE", "NOTICE"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

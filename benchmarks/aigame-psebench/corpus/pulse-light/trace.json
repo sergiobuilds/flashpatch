@@ -1,0 +1,11 @@
+{
+  "fixed_fps": 60,
+  "actions": [
+    {"frame": 0},
+    {"frame": 1},
+    {"frame": 2},
+    {"frame": 3},
+    {"frame": 4},
+    {"frame": 5}
+  ]
+}
