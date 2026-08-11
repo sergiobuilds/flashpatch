@@ -59,6 +59,16 @@ flashpatch compile <project> <contract-or-trace> \
 
 A renderer-backed adapter may declare `frame_npz_v1` and emit uint8 RGB frames plus strictly increasing timestamps. FlashPatch hashes that artifact before analysis. A headless numeric signal remains a smoke regression and is never pixel evidence.
 
+## Unity source preflight
+
+For a pinned Unity fixture, FlashPatch can bind declared project files before any editor import:
+
+```bash
+flashpatch unity-preflight unity-source-manifest.json /path/to/UnityProject
+```
+
+This checks only manifest-bound source bytes. It does not import Unity, build a player, capture frames, or establish Unity compatibility.
+
 ## Capture intake
 
 An externally produced renderer capture can be analyzed without claiming a source or engine integration:
