@@ -52,8 +52,14 @@ def test_public_file_api_closes_scan_repair_verify_loop(tmp_path: Path) -> None:
 
 
 def test_installed_cli_and_ci_contract_are_executable() -> None:
-    executable = Path(sys.executable).with_name("flashpatch")
-    assert executable.is_file()
+    executable_root = Path(sys.executable).parent
+    candidates = (
+        executable_root / "flashpatch",
+        executable_root / "flashpatch.exe",
+        executable_root / "Scripts" / "flashpatch.exe",
+    )
+    executable = next((candidate for candidate in candidates if candidate.is_file()), None)
+    assert executable is not None
     completed = subprocess.run(
         [str(executable), "--help"],
         check=True,
