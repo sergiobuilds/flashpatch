@@ -5,16 +5,23 @@ import shutil
 import subprocess
 import sys
 import threading
+import os
 from pathlib import Path
 from urllib.request import Request, urlopen
 
 import numpy as np
+import pytest
 
 from flashpatch import repair_video, scan_video, verify_video
 from flashpatch.media import VideoMetadata, write_video
 from flashpatch.web import create_server
 
 ROOT = Path(__file__).parents[1]
+
+
+def _godot_runtime_available() -> bool:
+    candidate = Path(os.environ.get("GODOT_BINARY", ROOT / ".tools" / "godot"))
+    return candidate.is_file() and os.access(candidate, os.X_OK)
 
 
 def _hazard_video(path: Path) -> VideoMetadata:
@@ -57,8 +64,13 @@ def test_installed_cli_and_ci_contract_are_executable() -> None:
     assert "scan" in completed.stdout
     assert "repair" in completed.stdout
     assert "web" in completed.stdout
+    workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    assert "pytest -q" in workflow
+    assert "flashpatch safety-demo" in workflow
+    assert "flashpatch demo" not in workflow
 
 
+@pytest.mark.skipif(not _godot_runtime_available(), reason="requires declared Godot runtime")
 def test_safety_demo_writes_all_terminal_receipts(tmp_path: Path) -> None:
     completed = subprocess.run(
         [sys.executable, "-m", "flashpatch.cli", "safety-demo", "--output", str(tmp_path)],

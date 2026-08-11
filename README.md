@@ -1,35 +1,37 @@
 # FlashPatch
 
-FlashPatch is a fail-closed visual QA tool for game projects. It analyzes rendered video for temporal visual-risk patterns, produces localized evidence, and can validate a narrowly scoped source-level repair against the same declared replay trace.
+**Fail-closed visual QA for game development.** FlashPatch is built for game builds, play captures, cinematics, UI, and VFX. Its verified source-bound path uses a Godot replay adapter: rendered frames are linked to one permitted source edit, then replayed with the same trace to verify risk reduction without gameplay drift.
 
-## Product scope
+## What FlashPatch does
 
-The public implementation supports the following path.
+1. Replays a declared Godot action trace in an isolated project copy.
+2. Captures renderer-owned RGB frames when the project supplies a non-headless replay adapter.
+3. Detects visual-risk intervals and binds them to timestamped runtime node, property, script, and source-line evidence.
+4. Tests one allowlisted exported source parameter edit at a time.
+5. Accepts a patch only when the copied project lowers risk and preserves the declared gameplay invariants.
 
-1. Read an RGB video or replay artifact with timestamp validation.
-2. Detect general flash, red flash, and dynamic regular-pattern risk.
-3. Localize hazardous frames and pixels.
-4. Test a declared one-parameter source edit in an isolated Godot project copy.
-5. Emit `PASS`, `SAFE`, `FAIL`, or `INCONCLUSIVE` receipts.
-
-The current implementation provides a Godot adapter. Unity and Unreal adapters are not included.
+Every terminal result is a hash-bound receipt: `PASS`, `SAFE`, `FAIL`, or `INCONCLUSIVE`.
 
 ## Safety behavior
 
-Missing renderer evidence, malformed timestamps, ambiguous source binding, multi-parameter edits, or replay preservation failures result in `INCONCLUSIVE`. A headless numeric replay is a regression signal and is not treated as pixel evidence.
+FlashPatch does not guess a replay contract, invent a runtime cause, or silently substitute a numeric smoke signal for pixel evidence. Missing renderer evidence, malformed timestamps, ambiguous source binding, multi-parameter edits, or gameplay drift produce `INCONCLUSIVE`.
+
+The current implementation provides a source-bound Godot path. Unity and Unreal adapters are not included.
 
 ## Quick start
 
-Python 3.11 or later is required. A renderer-backed run also needs the Godot version declared by the target project and a display-capable replay adapter.
+Requirements: Python 3.11 or later. A renderer-backed run also needs the Godot version declared by the project and a display-capable replay adapter.
 
 ```bash
 python -m pip install -e ".[dev]"
-flashpatch demo --output artifacts/demo
+
+export GODOT_BINARY=/path/to/Godot
+flashpatch safety-demo --output artifacts/safety-demo
 ```
 
-The demo writes a synthetic hazardous clip, its repaired output, and a receipt.
+The demo writes one receipt for each terminal state. Without the declared Godot binary, renderer-backed cases close as `INCONCLUSIVE`.
 
-To run a project that implements the replay contract:
+To run a project that implements the FlashPatch replay contract:
 
 ```bash
 flashpatch compile <project> <contract-or-trace> \
@@ -39,7 +41,7 @@ flashpatch compile <project> <contract-or-trace> \
 
 ## Replay contract
 
-`flashpatch compile` accepts `flashpatch-godot-safety-ci-v1`. A project declares its action trace, main scene, gameplay-preservation fields, and allowed patch candidates.
+`flashpatch compile` accepts `flashpatch-godot-safety-ci-v1`. A project declares its trace, scene, gameplay preservation fields, and the one-parameter patch candidates that FlashPatch may test.
 
 ```json
 {
@@ -55,7 +57,7 @@ flashpatch compile <project> <contract-or-trace> \
 }
 ```
 
-Renderer-backed adapters may instead emit `frame_npz_v1` with uint8 RGB frames and strictly increasing timestamps. FlashPatch binds that artifact to its analysis before accepting a repair.
+A renderer-backed adapter may declare `frame_npz_v1` and emit uint8 RGB frames plus strictly increasing timestamps. FlashPatch hashes that artifact before analysis. A headless numeric signal remains a smoke regression and is never pixel evidence.
 
 ## Development
 
@@ -66,7 +68,7 @@ python -m pytest -q \
   tests/test_product_surface.py::test_installed_cli_and_ci_contract_are_executable
 ```
 
-Godot-backed compilation needs a matching Godot binary and is run in an environment that supplies one.
+CI runs that portable regression subset on supported Python versions. A separate Ubuntu job downloads the pinned Godot 4.7.1 release, verifies its SHA-256, and runs the renderer-backed safety demo.
 
 ## License
 
