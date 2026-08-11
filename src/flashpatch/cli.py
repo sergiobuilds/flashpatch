@@ -14,6 +14,7 @@ from .media import read_video, write_video
 from .renderer_artifact import RendererArtifactError
 from .renderer_intake import inspect_renderer_capture, write_renderer_intake_receipt
 from .safety_ci import compile_project, write_receipt
+from .unity_preflight import UnityPreflightError, verify_unity_source_preflight
 from .verify import verify as verify_frames
 
 
@@ -300,6 +301,9 @@ def main() -> None:
     )
     renderer_intake.add_argument("input", type=Path)
     renderer_intake.add_argument("--receipt", type=Path, required=True)
+    unity_preflight = subparsers.add_parser("unity-preflight", help="bind pinned Unity source files without importing or running the editor")
+    unity_preflight.add_argument("manifest", type=Path)
+    unity_preflight.add_argument("project", type=Path)
     repair = subparsers.add_parser("repair", help="repair an MP4 file and write a receipt")
     repair.add_argument("input", type=Path)
     repair.add_argument("output", type=Path)
@@ -335,6 +339,12 @@ def main() -> None:
             raise SystemExit(2) from exc
         write_renderer_intake_receipt(receipt, args.receipt)
         print(json.dumps(receipt, indent=2, sort_keys=True))
+    elif args.command == "unity-preflight":
+        try:
+            print(json.dumps(verify_unity_source_preflight(args.manifest, args.project), indent=2, sort_keys=True))
+        except (OSError, UnityPreflightError) as exc:
+            print(json.dumps({"verdict": "INCONCLUSIVE", "reason": str(exc)}, sort_keys=True))
+            raise SystemExit(2) from exc
     elif args.command == "repair":
         receipt = _repair_file(args.input, args.output, args.receipt)
         print(json.dumps(receipt, indent=2, sort_keys=True))
