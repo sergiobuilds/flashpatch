@@ -103,7 +103,7 @@ def test_browser_judge_flow_uploads_repairs_and_downloads(tmp_path: Path) -> Non
         server.server_close()
         thread.join(timeout=5)
 
-    assert "WCAG 2.2" in page
+    assert "Temporal visual-risk scan" in page
     assert "Upload video" in page
     assert payload["scan"]["hazardous"] is True
     assert payload["repair"]["status"] == "VERIFIED"

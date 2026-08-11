@@ -298,7 +298,7 @@ def main() -> None:
     repair.add_argument("--receipt", type=Path, required=True)
     verify = subparsers.add_parser("verify", help="verify an MP4 file")
     verify.add_argument("input", type=Path)
-    web = subparsers.add_parser("web", help="serve the judge-visible browser demo")
+    web = subparsers.add_parser("web", help="serve the browser visual QA demo")
     web.add_argument("--host", default="127.0.0.1")
     web.add_argument("--port", type=int, default=8080)
     web.add_argument("--workspace", type=Path, default=Path("artifacts/web"))

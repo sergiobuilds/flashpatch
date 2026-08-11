@@ -1,6 +1,6 @@
 # FlashPatch
 
-FlashPatch is a fail-closed visual QA tool for Godot game projects. It analyzes rendered video for photosensitive visual-risk patterns, produces localized evidence, and can validate a narrowly scoped source-level repair against the same declared replay trace.
+FlashPatch is a fail-closed visual QA tool for game projects. It analyzes rendered video for temporal visual-risk patterns, produces localized evidence, and can validate a narrowly scoped source-level repair against the same declared replay trace.
 
 ## Product scope
 
@@ -12,7 +12,7 @@ The public implementation supports the following path.
 4. Test a declared one-parameter source edit in an isolated Godot project copy.
 5. Emit `PASS`, `SAFE`, `FAIL`, or `INCONCLUSIVE` receipts.
 
-Godot is the current adapter. Unity and Unreal adapters are not included.
+The current implementation provides a Godot adapter. Unity and Unreal adapters are not included.
 
 ## Safety behavior
 
