@@ -59,6 +59,16 @@ flashpatch compile <project> <contract-or-trace> \
 
 A renderer-backed adapter may declare `frame_npz_v1` and emit uint8 RGB frames plus strictly increasing timestamps. FlashPatch hashes that artifact before analysis. A headless numeric signal remains a smoke regression and is never pixel evidence.
 
+## Capture intake
+
+An externally produced renderer capture can be analyzed without claiming a source or engine integration:
+
+```bash
+flashpatch renderer-intake capture.npz --receipt artifacts/capture-intake.json
+```
+
+The capture must satisfy `frame_npz_v1`. Its receipt records only the supplied RGB frames, timestamps, and detector result. Engine identity, source causality, replay preservation, display output, and repair effectiveness require their own bound evidence.
+
 ## Development
 
 ```bash

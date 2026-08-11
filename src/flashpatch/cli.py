@@ -11,6 +11,8 @@ import numpy as np
 from .core import analyze, repair as repair_frames, repair_with_evidence
 from .independent import verify_video_independently
 from .media import read_video, write_video
+from .renderer_artifact import RendererArtifactError
+from .renderer_intake import inspect_renderer_capture, write_renderer_intake_receipt
 from .safety_ci import compile_project, write_receipt
 from .verify import verify as verify_frames
 
@@ -292,6 +294,12 @@ def main() -> None:
     scan = subparsers.add_parser("scan", help="scan an MP4 file for flash hazards")
     scan.add_argument("input", type=Path)
     scan.add_argument("--mask", type=Path)
+    renderer_intake = subparsers.add_parser(
+        "renderer-intake",
+        help="analyze a strict frame_npz_v1 capture without inferring an engine or source",
+    )
+    renderer_intake.add_argument("input", type=Path)
+    renderer_intake.add_argument("--receipt", type=Path, required=True)
     repair = subparsers.add_parser("repair", help="repair an MP4 file and write a receipt")
     repair.add_argument("input", type=Path)
     repair.add_argument("output", type=Path)
@@ -319,6 +327,14 @@ def main() -> None:
             raise SystemExit(1)
     elif args.command == "scan":
         print(json.dumps(_scan_file(args.input, args.mask), indent=2, sort_keys=True))
+    elif args.command == "renderer-intake":
+        try:
+            receipt = inspect_renderer_capture(args.input)
+        except (OSError, RendererArtifactError) as exc:
+            print(json.dumps({"verdict": "INCONCLUSIVE", "reason": str(exc)}, sort_keys=True))
+            raise SystemExit(2) from exc
+        write_renderer_intake_receipt(receipt, args.receipt)
+        print(json.dumps(receipt, indent=2, sort_keys=True))
     elif args.command == "repair":
         receipt = _repair_file(args.input, args.output, args.receipt)
         print(json.dumps(receipt, indent=2, sort_keys=True))
