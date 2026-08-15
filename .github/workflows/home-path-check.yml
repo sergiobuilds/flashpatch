@@ -1,0 +1,70 @@
+name: home-path-check
+
+# 실행·설정 파일에 절대 홈 경로가 들어오는 것을 서버에서 막는다.
+# 클라이언트 pre-push hook은 --no-verify와 core.hooksPath 변경으로 우회되므로,
+# 실제 강제는 여기서 한다. (2026-08 elitedesk→campbell 이전 사고 재발 방지)
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  home-path:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ripgrep 설치
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ripgrep
+
+      - name: 절대 홈 경로 검사
+        shell: bash
+        run: |
+          # GitHub Actions는 bash에 -e를 붙인다. rg는 "매치 없음"에 1을 반환하므로
+          # -e 아래서는 정상 통과가 곧 실패가 된다. 명시적으로 끄고 직접 판정한다.
+          set +e
+          set -uo pipefail
+          ALLOW=".home-path-allow"
+          PATTERN='(?<![\w.])(/home/|/Users/)[^/[:space:]"'"'"'`:,;)\]}=*?|<>]+/'
+          INCLUDE=(-g '*.sh' -g '*.bash' -g '*.service' -g '*.timer' -g '*.socket'
+                   -g '*.env' -g '.env*' -g '*.conf' -g '*.ini' -g '*.toml'
+                   -g '**/hooks/*' -g 'hooks/*')
+          EXCLUDE=(-g '!**/node_modules/**' -g '!**/.venv*/**' -g '!**/venv/**'
+                   -g '!**/site-packages/**' -g '!**/__pycache__/**' -g '!**/dist/**'
+                   -g '!**/build/**' -g '!**/.next/**' -g '!**/target/**'
+                   -g '!**/vendor/**' -g '!**/third_party/**' -g '!**/_versions/**'
+                   -g '!**/_archive/**' -g '!**/archive/**' -g '!**/archives/**'
+                   -g '!**/artifacts/**' -g '!**/*.sample')
+
+          hits=$(mktemp); errs=$(mktemp)
+          rg --null -n -H --hidden -P "$PATTERN" "${INCLUDE[@]}" "${EXCLUDE[@]}" -- . > "$hits" 2>"$errs"
+          rc=$?
+          if [ "$rc" -ge 2 ]; then
+            echo "::error::검사 실패 (rg rc=$rc)"; sed 's/^/  /' "$errs"; exit 2
+          fi
+
+          n=0
+          while IFS= read -r -d '' path && IFS= read -r rest; do
+            [ -z "$path" ] && continue
+            if [ -f "$ALLOW" ]; then
+              skip=0
+              while IFS= read -r a || [ -n "$a" ]; do
+                a="${a%%#*}"; a="$(printf '%s' "$a" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+                [ -z "$a" ] && continue
+                case "$path" in *"$a"*) skip=1; break ;; esac
+              done < "$ALLOW"
+              [ "$skip" = 1 ] && continue
+            fi
+            echo "::error file=${path#./}::절대 홈 경로 — 셸은 \$HOME, systemd 유닛은 %h를 쓴다"
+            echo "  ${path#./}:${rest:0:160}"
+            n=$((n+1))
+          done < "$hits"
+
+          if [ "$n" -gt 0 ]; then
+            echo
+            echo "위반 ${n}건. 기계를 옮기면 깨지는 경로다."
+            echo "정당한 사례는 $ALLOW 에 사유와 함께 등록한다."
+            exit 1
+          fi
+          echo "home-path-check 통과"
