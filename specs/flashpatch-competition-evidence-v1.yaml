@@ -1,0 +1,135 @@
+authority_role: execution-seed
+authority_project_root: .
+authority_master_map_version: 2026-08-04_v92
+authority_leaf_id: L5
+authority_writeback: [own_leaf_status, status_section, history, chronicle_proposal, evidence_links]
+schema_version: flashpatch-competition-evidence-v1
+purpose: external evidence contract for FlashPatch Godot Safety CI
+scope:
+  required_chain: [renderer_rgb_frames, timestamped_risk_detection, runtime_node_property_attribution, one_exported_source_parameter_patch, isolated_counterfactual_replay, exact_action_and_gameplay_preservation, hash_bound_receipt]
+  excluded: [video_postprocessing_product, unity_support, unreal_support, medical_certification]
+runtime:
+  isolated_worktree_required: true
+  untrusted_text_data_only: true
+  timeout_seconds: 900
+  max_retries_after_initial: 2
+  paths:
+    validators: src/flashpatch/competition.py
+    tests: tests/test_competition.py
+    evidence: evidence/competition
+    checkpoints: evidence/competition/checkpoints
+    retry_log: evidence/competition/retry-log.jsonl
+    atomic_publish: evidence/competition/.tmp
+  mutable_paths: [src/flashpatch/competition.py, tests/test_competition.py, specs/flashpatch-competition-evidence-v1.yaml, evidence/competition]
+  protected_paths: [.closure-artifacts, .ouroboros]
+  freshness_rule: any source_revision, input_hash, trace_hash, environment_digest, oracle_version, or command_hash mismatch invalidates aggregation and claim-gate
+  interruption_rule: timeout or interruption atomically publishes an INCONCLUSIVE receipt and retry record; resume reuses only identical completed checkpoint hash
+receipt_contract:
+  decision_enum: [PASS, SAFE, FAIL, INCONCLUSIVE]
+  patch_type: [object, 'null']
+  safe_requires: {patch: null, failure_reason: null}
+  pass_requires: [source_file, source_line, exported_parameter, factual_value, candidate_value, diff_sha256]
+  fail_or_inconclusive_requires: [failure_reason]
+  required_hashes: [input_sha256, trace_sha256, factual_frame_sha256, candidate_frame_sha256, source_snapshot_sha256, diff_sha256]
+  sha256_pattern: '^[0-9a-f]{64}$'
+validators:
+  - id: plan_schema
+    pass: {command: python -m flashpatch.competition validate-plan --plan specs/flashpatch-competition-evidence-v1.yaml, exit: 0, contains: 'VALID plan=flashpatch-competition-evidence-v1'}
+    fail: {command: python -m flashpatch.competition validate-plan --plan tests/fixtures/competition/plan-missing-freshness.yaml, exit: 1, contains: 'missing global_runtime.freshness_rule'}
+  - id: case_schema
+    pass: {command: python -m flashpatch.competition validate-case --case tests/fixtures/competition/public-godot-001-controlled.json, exit: 0, contains: 'VALID case_id=public-godot-001-controlled'}
+    fail: {command: python -m flashpatch.competition validate-case --case tests/fixtures/competition/case-safe-with-patch.json, exit: 1, contains: 'SAFE requires patch=null'}
+  - id: provenance
+    pass: {command: python -m flashpatch.competition validate-provenance --manifest tests/fixtures/competition/provenance-valid.json, exit: 0, contains: 'VALID provenance'}
+    fail: {command: python -m flashpatch.competition validate-provenance --manifest tests/fixtures/competition/provenance-revision-mismatch.json, exit: 1, contains: 'source revision mismatch'}
+  - id: receipt_hash
+    pass: {command: python -m flashpatch.competition verify-receipt --receipt tests/fixtures/competition/receipt-pass-valid.json, exit: 0, contains: 'VALID receipt decision=PASS'}
+    fail: {command: python -m flashpatch.competition verify-receipt --receipt tests/fixtures/competition/receipt-frame-hash-mismatch.json, exit: 1, contains: 'frame hash mismatch'}
+  - id: blind_league
+    pass: {command: python -m flashpatch.competition prepare-league --run tests/fixtures/competition/league-valid, exit: 0, contains: 'SEALED lanes=3'}
+    fail: {command: python -m flashpatch.competition prepare-league --run tests/fixtures/competition/league-identity-leak, exit: 1, contains: 'identity leakage'}
+    follow_up:
+      - {command: python -m flashpatch.competition aggregate-league --run tests/fixtures/competition/league-valid --results tests/fixtures/competition/league-valid/results.json, exit: 0, contains: 'SEALED aggregate'}
+      - {command: python -m flashpatch.competition reveal-league --run tests/fixtures/competition/league-valid --aggregate tests/fixtures/competition/league-valid/aggregate.json, exit: 0, contains: 'REVEALED after seal'}
+  - id: claim_gate
+    pass: {command: python -m flashpatch.competition claim-gate --manifest tests/fixtures/competition/claim-ineligible.json, exit: 1, contains: NOT_CLAIMABLE}
+    fail: {command: python -m flashpatch.competition claim-gate --manifest tests/fixtures/competition/claim-unfrozen.json, exit: 1, contains: 'unfrozen input'}
+leaves:
+  - leaf_id: L6
+    master_map_anchor: '4.5.1 public Godot controlled chain'
+    competitor_role: product-e2e-reference-not-comparator
+    case_id: public-godot-001-controlled
+    naturally_factual_or_controlled_mutation: controlled_mutation
+    source: {repository_url: https://github.com/godotengine/godot-demo-projects, source_revision: 52e3004, license: MIT, project_path: 2d/pong}
+    selection_rule: public license plus immutable revision plus deterministic trace plus non-headless RGB capture plus source binding plus gameplay-state oracle; never label this controlled mutation as an upstream defect
+    risk: {class: photosensitive_general_flash, oracle: flashpatch-frame-risk, version: frame_npz_v1-general-flash-strict, algorithm: RGB frame detector on monotonic timestamps, factual_threshold: 1.0, residual_threshold: 0.0, sampling: 'every 320x180 uint8 viewport frame', factual_label: 'controlled mutation diff hash plus recomputed factual frame score'}
+    required_freeze: [trace_hash, input_hash, environment_digest, source_snapshot_sha256, mutation_diff_sha256]
+    budget: {wall_clock_seconds: 900, retries_after_initial: 2, repeats: 3}
+    preservation_oracle_version: action_frame_v1+gameplay_state_fingerprint_v1
+    pass_criteria: [factual_risk_at_least_threshold, runtime_event_matches_frame_and_source, exactly_one_exported_parameter_diff, residual_risk_zero, exact_action_sequence, identical_declared_invariants, all_receipt_hashes_valid]
+    fail_or_inconclusive: [capture_missing, timestamp_non_monotonic, source_binding_mismatch, patch_count_not_one, invariant_mismatch, hash_mismatch, timeout]
+    adversarial_counterexample: timing-preserved-risk-reduction-with-state-change
+    exclusion_reason: null
+    verification_command: python -m flashpatch.competition verify-chain --case evidence/competition/cases/public-godot-001-controlled.json
+    expected_artifacts: [freeze-manifest.json, factual-receipt.json, candidate-receipt.json, chain-receipt.json, retry-log.jsonl]
+    checkpoint: evidence/competition/checkpoints/L6.json
+    resume_command: python -m flashpatch.competition resume --leaf L6
+    idempotency_rule: identical frozen hashes reuse only a verified completed checkpoint
+    freshness_rule: source, trace, input frames, environment, and oracle must match freeze manifest
+    mutable_paths: [src/flashpatch/competition.py, tests/test_competition.py, specs/flashpatch-competition-evidence-v1.yaml, evidence/competition]
+    untrusted_text_data_only: true
+  - leaf_id: L7
+    master_map_anchor: '4.5.2 direct detector comparison'
+    competitor_role: pixel-risk-detector
+    case_id: detector-comparison-preregistered
+    naturally_factual_or_controlled_mutation: stratified_and_reported_separately
+    competitors: [EA_IRIS, FFmpeg_vf_photosensitivity, TooFlashy_or_EPI_LENS]
+    required_freeze: [repository_url, license, source_revision, installation_command, input_conversion_hash, environment_digest, risk_oracle_version, preservation_oracle_version, retry_rule]
+    pass_criteria: [same_rgb_timestamp_input_or_hashed_conversion, all_provenance_valid, three_repeats_complete]
+    fail_or_inconclusive: [unrunnable, unpinned_revision, missing_license, conversion_drift, hidden_retry, oracle_mismatch]
+    adversarial_counterexample: comparator_io_conversion_drift
+    exclusion_reason: REQUIRED_IF_NOT_SCOREABLE
+    verification_command: python -m flashpatch.competition compare-detectors --manifest evidence/competition/detector-comparison-manifest.json
+    expected_artifacts: [comparator-provenance.json, conversion-receipt.json, raw-runs.jsonl, aggregate.json]
+    checkpoint: evidence/competition/checkpoints/L7.json
+    resume_command: python -m flashpatch.competition resume --leaf L7
+    idempotency_rule: frozen comparator and input hashes identify a run uniquely
+    freshness_rule: comparator, input, oracle, or environment mismatch expires output
+    mutable_paths: [src/flashpatch/competition.py, tests/test_competition.py, evidence/competition]
+    untrusted_text_data_only: true
+  - leaf_id: L8
+    master_map_anchor: '4.5.3 sealed blind league'
+    competitor_role: competition-artifact
+    case_id: artifact-league-v1
+    naturally_factual_or_controlled_mutation: not_applicable
+    protocol: artifact census, parity reconstruction, freeze, three balanced lanes, sealed aggregate, A/B-and-B/A final, reveal
+    pass_criteria: [scoreable_census, parity_bounds, private_identity_map, three_balanced_lanes, sealed_before_reveal]
+    fail_or_inconclusive: [identity_leak, asymmetric_evidence, missing_score, unsealed_reveal, prompt_overflow]
+    adversarial_counterexample: richer_favored_card
+    exclusion_reason: REQUIRED_IF_UNSCORABLE
+    verification_command: python -m flashpatch.competition prepare-league --run evidence/competition/league
+    expected_artifacts: [freeze-manifest.json, private/identity-mapping.json, cell-packets.json, aggregate.json, revealed.json]
+    checkpoint: evidence/competition/checkpoints/L8.json
+    resume_command: python -m flashpatch.competition resume --leaf L8
+    idempotency_rule: aggregate accepts only the frozen assignment set
+    freshness_rule: card, rubric, anchor, assignment, or helper hash change invalidates run
+    mutable_paths: [src/flashpatch/competition.py, tests/test_competition.py, evidence/competition]
+    untrusted_text_data_only: true
+  - leaf_id: L9
+    master_map_anchor: '4.5.4 external claim gate'
+    competitor_role: claim-evaluator
+    case_id: external-claim-v1
+    naturally_factual_or_controlled_mutation: stratified_and_reported_separately
+    preregistered_gate: {min_distinct_public_repositories: 3, min_independent_cases: 9, repeats_per_case: 3, max_inconclusive_cases: 1, false_negative_delta_max: 0, f1_mean_delta_min: 0.05, bootstrap_seed: 20260801, bootstrap_resamples: 10000, lower_confidence_bound_must_exceed: 0, baseline_inconclusive: NOT_CLAIMABLE, capability_mismatch: NOT_APPLICABLE}
+    pass_criteria: [all_manifests_frozen, all_required_cases_complete, all_direct_baselines_scoreable, all_detector_win_conditions_met]
+    fail_or_inconclusive: [fewer_than_three_repositories, fewer_than_nine_cases, unfrozen_input, excess_inconclusive, baseline_unscorable, statistical_gate_failure]
+    adversarial_counterexample: self_authored_fixture_presented_as_external
+    exclusion_reason: REQUIRED_IF_NOT_CLAIMABLE
+    verification_command: python -m flashpatch.competition claim-gate --manifest evidence/competition/claim-manifest.json
+    expected_artifacts: [claim-manifest.json, claim-verdict.json, bootstrap-distribution.npz]
+    checkpoint: evidence/competition/checkpoints/L9.json
+    resume_command: python -m flashpatch.competition resume --leaf L9
+    idempotency_rule: complete frozen manifest hash keys verdict
+    freshness_rule: result, manifest, comparator, or bootstrap config hash change invalidates verdict
+    mutable_paths: [src/flashpatch/competition.py, tests/test_competition.py, evidence/competition]
+    untrusted_text_data_only: true

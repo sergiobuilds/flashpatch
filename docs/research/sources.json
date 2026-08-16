@@ -1,0 +1,924 @@
+{
+  "version": "2026-07-29_v23",
+  "retrieved_at": "2026-07-29",
+  "category_evidence": {
+    "A": [
+      "contest-overview-2026",
+      "contest-operating-rules-2026",
+      "result-report-template-2026",
+      "orientation-notice-2026",
+      "orientation-program-image-2026",
+      "official-youtube-videos"
+    ],
+    "B": [
+      "wcag22-recommendation",
+      "wcag22-understanding-sc231",
+      "wcag22-technique-g15",
+      "wcag22-technique-g19",
+      "wcag22-technique-g176",
+      "itu-r-bt1702-3",
+      "trace-peat-official",
+      "ofcom-itc-flashing-guidance-2002",
+      "iso-9241-391-2016",
+      "apple-dim-flashing-lights-2023",
+      "game-accessibility-guidelines-flashing",
+      "itu-r-bt709-6",
+      "w3c-mediaqueries5-reduced-motion"
+    ],
+    "C": [
+      "nomura-atf-patients-2000",
+      "saleem-incidence-india-1994",
+      "harding-wind-flicker-2008",
+      "w3c-www-style-2011may-0687",
+      "fisher-ilae-photosensitivity-consensus-2005"
+    ],
+    "D": [
+      "ffmpeg-photosensitivity-601d9ee",
+      "trace-peat-official",
+      "kaya-pse-detection-correction-2025",
+      "samfatu-pse-detection-correction-0776ea3",
+      "us11381715b2-photosensitivity-repair",
+      "epi-lens-a7c5ab9",
+      "flashguard-2507.19692v1",
+      "tooflashy-8274e1e",
+      "apple-dim-flashing-lights-2023",
+      "jordan-pse-tool-conformance-2025",
+      "south2021-photosensitive-flashes"
+    ],
+    "E": [
+      "jordan-pse-tool-conformance-2025",
+      "trace-pse-test-media-f8d3dac",
+      "flashguard-2507.19692v1",
+      "blender-spring-ccby4",
+      "blender-tears-of-steel-download-page-2026-07-29",
+      "youtube-vos-evaluation-and-terms",
+      "xiph-video-test-media-corpus"
+    ],
+    "F": [
+      "jordan-pse-tool-conformance-2025",
+      "south2021-seizure-gifs-primary-project-page",
+      "kaya-pse-detection-correction-2025",
+      "samfatu-pse-detection-correction-0776ea3",
+      "us11381715b2-photosensitivity-repair",
+      "flashguard-2507.19692v1",
+      "tooflashy-8274e1e",
+      "w3c-www-style-2011may-0687",
+      "iso-9241-391-2016",
+      "itu-r-bt1702-3",
+      "south2021-photosensitive-flashes",
+      "parallel-realtime-photosensitive-seizure-detection-2016"
+    ],
+    "G": [
+      "jordan-pse-tool-conformance-2025",
+      "south2021-seizure-gifs-primary-project-page",
+      "trace-pse-test-media-f8d3dac",
+      "flashguard-2507.19692v1",
+      "tooflashy-8274e1e",
+      "iso-9241-391-2016",
+      "youtube-vos-evaluation-and-terms",
+      "xiph-video-test-media-corpus",
+      "south2021-photosensitive-flashes",
+      "netflix-vmaf-e9909adb"
+    ],
+    "H": [
+      "obs-studio-repository",
+      "ffmpeg-libavfilter-photosensitivity",
+      "chromium-blink-accessibility-video",
+      "apple-dim-flashing-lights-2023",
+      "game-accessibility-guidelines-flashing",
+      "w3c-mediaqueries5-reduced-motion"
+    ],
+    "I": [
+      "contest-operating-rules-2026",
+      "result-report-template-2026",
+      "trace-peat-official",
+      "trace-pse-test-media-f8d3dac",
+      "samfatu-pse-detection-correction-0776ea3",
+      "us11381715b2-photosensitivity-repair",
+      "epi-lens-a7c5ab9",
+      "flashguard-2507.19692v1",
+      "tooflashy-8274e1e",
+      "ofcom-itc-flashing-guidance-2002",
+      "obs-studio-repository",
+      "ffmpeg-libavfilter-photosensitivity",
+      "chromium-blink-accessibility-video",
+      "flashpatch-single-maintainer-roadmap",
+      "iso-9241-391-2016",
+      "apple-dim-flashing-lights-2023",
+      "game-accessibility-guidelines-flashing",
+      "blender-spring-ccby4",
+      "youtube-vos-evaluation-and-terms",
+      "itu-r-bt709-6",
+      "w3c-mediaqueries5-reduced-motion",
+      "xiph-video-test-media-corpus",
+      "south2021-photosensitive-flashes"
+    ],
+    "J": [
+      "flashpatch-single-maintainer-roadmap"
+    ]
+  },
+  "sources": [
+    {
+      "id": "south2021-seizure-gifs-primary-project-page",
+      "title": "Detecting and Defending Against Seizure-Inducing GIFs in Social Media",
+      "url": "https://vis.khoury.northeastern.edu/pubs/South2021DetectingDefendingSeizure/",
+      "source_type": "official_university_project_page_for_peer_reviewed_study",
+      "published_or_version": "CHI 2021, DOI 10.1145/3411764.3445510",
+      "retrieved_at": "2026-07-29",
+      "sha256": "cef69cfc0052847db1485f5f64bd29be817a6738ed6290d06267b05edc01acfc",
+      "status": "available",
+      "notes": "Supervisor directly retrieved and hashed Northeastern Khoury Vis Lab's official project page. Its Abstract says the authors validated with simulated GIFs and GIFs collected from social media and links study materials at OSF. This is a primary-study project page, not an approval to redistribute linked media or OSF materials.",
+      "category_evidence": [
+        "F",
+        "G"
+      ]
+    },
+    {
+      "id": "south2021-seizure-gifs-paper-pdf",
+      "title": "Detecting and Defending Against Seizure-Inducing GIFs in Social Media, Author PDF",
+      "url": "https://osf.io/4kgu6/download",
+      "source_type": "author_hosted_peer_reviewed_paper_pdf",
+      "published_or_version": "CHI 2021, DOI 10.1145/3411764.3445510",
+      "retrieved_at": "2026-07-29",
+      "sha256": "ced1e7175de9931ddceaf58e551a4218e5af84f181b14073784cbe92525b56d0",
+      "status": "available",
+      "notes": "Supervisor directly downloaded and text-extracted the author-hosted PDF. Section 5 Evaluation states that simulated GIFs have known ground truth, while randomized and potentially dangerous GIFs collected in the wild have unknown ground truth. The paper describes binary risk-tool consensus and deliberately does not publish the potentially dangerous dataset. It contains no spatial mask annotation method, temporal-region adjudication rule, annotator agreement procedure, or reusable actual-risk gold labels.",
+      "category_evidence": [
+        "F",
+        "G"
+      ]
+    },
+    {
+      "id": "blender-spring-ccby4",
+      "title": "Spring Open Movie About and Licensing",
+      "url": "https://studio.blender.org/projects/spring/pages/about/",
+      "source_type": "official_project_license_page",
+      "published_or_version": "Spring Open Movie, Blender Studio",
+      "retrieved_at": "2026-07-29",
+      "sha256": "99fd99b118179d4057b60d7bd308af5789ccb4dbdf204c741c92943bd75f159b",
+      "status": "available",
+      "notes": "Supervisor retrieved and hashed the official About page on 2026-07-29. The licensing section grants CC BY 4.0 to the Spring Open Movie and data published on the site, permits commercial reuse with proper attribution, and excludes logos, trademarks, and material clearly not produced by Spring. Official gallery asset 696 was a cloud movement test with a YouTube watch link, not retrievable video-file bytes. No specific Spring file is approved for the corpus until a live direct file URL, byte SHA-256, timecode, attribution, and exclusion check are bound.",
+      "category_evidence": [
+        "E",
+        "I"
+      ]
+    },
+    {
+      "id": "youtube-vos-evaluation-and-terms",
+      "title": "YouTube-VOS Video Object Segmentation Evaluation and Terms of Use",
+      "url": "https://youtube-vos.org/dataset/",
+      "source_type": "official_dataset_documentation",
+      "published_or_version": "YouTube-VOS 2018-2022 dataset documentation",
+      "retrieved_at": "2026-07-29",
+      "sha256": "03ce2fa38aca450049783c62abd863e0773485bbf08237dfba7090c094a70537",
+      "status": "available",
+      "notes": "Supervisor directly retrieved and hashed the official Video Object Segmentation page on 2026-07-29. Its 2018 section says the training set has 3,471 videos with dense 6 fps object annotations; Evaluation says it uses Region Jaccard (J) and Boundary F (F). The separately fetched official Term of Use page hash is 11574a956c85d65c66a312fb88c5c0253536aebd5e6711248f90a0571692411b: annotations are CC BY 4.0, but the data is non-commercial research only, the organizers disclaim non-infringement, and researchers bear responsibility for copies of copyrighted videos. FlashPatch may use the annotation density and J/F evaluation pattern only as a method reference, never as photosensitivity-risk-mask ground truth or redistributable video-corpus authority.",
+      "category_evidence": [
+        "E",
+        "G",
+        "I"
+      ]
+    },
+    {
+      "id": "contest-overview-2026",
+      "title": "2026 오픈소스 개발자대회 대회 개요",
+      "url": "https://osscontest.kr/overview",
+      "source_type": "official_webpage",
+      "published_or_version": "2026",
+      "retrieved_at": "2026-07-26",
+      "sha256": null,
+      "status": "available",
+      "notes": "대회 공식 개요 페이지. 일정과 대회 기본 정보를 확인하는 기준 URL이다.",
+      "category_evidence": [
+        "A"
+      ]
+    },
+    {
+      "id": "contest-operating-rules-2026",
+      "title": "2026 오픈소스 개발자대회 운영규정",
+      "url": "https://api.osscontest.kr/static/uploads/b3b4491a-3bbe-454e-a1d8-6ed475b01b14.pdf",
+      "source_type": "official_pdf",
+      "published_or_version": "2026-06, 15 pages",
+      "retrieved_at": "2026-07-26",
+      "sha256": "5c129ed9f389ecc04b6f7ba8b97f719a313efaf32aea9178e635500023ae1da1",
+      "status": "available",
+      "notes": "원문 파일은 저장소에 넣지 않는다. 제8조부터 제16조를 claim locator로 사용한다.",
+      "category_evidence": [
+        "A",
+        "I"
+      ]
+    },
+    {
+      "id": "result-report-template-2026",
+      "title": "2026 오픈소스 개발자대회 결과보고서 양식",
+      "url": "https://api.osscontest.kr/static/uploads/46414fba-c473-4dae-b595-7214d635b494.zip",
+      "source_type": "official_archive",
+      "published_or_version": "2026 result report template",
+      "retrieved_at": "2026-07-26",
+      "sha256": "9a5d2968d48ff8a8fd85ce991dc72dc2b0818d7e8c06ebb871cc97ce5cc62d95",
+      "status": "available",
+      "notes": "원문 ZIP과 내부 문서 파일은 저장소에 넣지 않는다. 결과보고서 작성요령과 붙임 1, 붙임 2를 locator로 사용한다.",
+      "category_evidence": [
+        "A",
+        "I"
+      ]
+    },
+    {
+      "id": "orientation-notice-2026",
+      "title": "2026 오픈소스 개발자대회 오리엔테이션 안내",
+      "url": "https://osscontest.kr/notice/31",
+      "source_type": "official_notice",
+      "published_or_version": "published 2026-07-22",
+      "retrieved_at": "2026-07-26",
+      "sha256": null,
+      "status": "available",
+      "notes": "오리엔테이션 공지 게시물. 2026-07-23 일정과 접속정보 개별 발송 안내를 확인했다.",
+      "category_evidence": [
+        "A"
+      ]
+    },
+    {
+      "id": "orientation-program-image-2026",
+      "title": "2026 오픈소스 개발자대회 오리엔테이션 프로그램 이미지",
+      "url": "https://api.osscontest.kr/static/uploads/8d98fbbb-d256-4fa1-9521-1ff689f0c885.png",
+      "source_type": "official_image",
+      "published_or_version": "2026-07-22 notice attachment",
+      "retrieved_at": "2026-07-26",
+      "sha256": "808e6b3c6830a6b05431795dfe1fa4ea325cbee81ac5feaf450985b0153a77d7",
+      "status": "available",
+      "notes": "원본 이미지는 저장소에 넣지 않는다. 14:30 시작과 15:20부터 15:40까지의 대회 소개 및 평가기준 안내 순서를 확인했다.",
+      "category_evidence": [
+        "A"
+      ]
+    },
+    {
+      "id": "official-youtube-videos",
+      "title": "오픈소스 개발자대회 공식 YouTube 영상 목록",
+      "url": "https://www.youtube.com/@osscontest/videos",
+      "source_type": "official_video_channel",
+      "published_or_version": "checked 2026-07-26",
+      "retrieved_at": "2026-07-26",
+      "sha256": null,
+      "status": "available",
+      "notes": "확인 시점 최신 공개 영상은 2025 수상작이다. 2026 오리엔테이션 녹화 공개 여부를 계속 확인한다.",
+      "category_evidence": [
+        "A"
+      ]
+    },
+    {
+      "id": "wcag22-recommendation",
+      "title": "Web Content Accessibility Guidelines (WCAG) 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/#three-flashes-or-below-threshold",
+      "source_type": "w3c_recommendation",
+      "published_or_version": "WCAG 2.2, W3C Recommendation 2023-10-05",
+      "retrieved_at": "2026-07-26",
+      "sha256": "6e3c5fe397257cae509a2fb4752b73062cf8cbeb92c2cec618989b17e4cf7057",
+      "status": "available",
+      "notes": "SC 2.3.1와 general and red flash thresholds 용어 정의 원문. License: W3C Document License 2023. Locator: #three-flashes-or-below-threshold 및 #dfn-general-flash-and-red-flash-thresholds.",
+      "category_evidence": [
+        "B"
+      ]
+    },
+    {
+      "id": "wcag22-understanding-sc231",
+      "title": "Understanding Success Criterion 2.3.1: Three Flashes or Below Threshold",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/three-flashes-or-below-threshold.html",
+      "source_type": "w3c_understanding_document",
+      "published_or_version": "Updated 2025-09-17",
+      "retrieved_at": "2026-07-26",
+      "sha256": "3107de0b82b0d56ca44a6c3a2fa0ed1390e22e8cddd5059544ca7fcf495ec709",
+      "status": "available",
+      "notes": "sRGB relative luminance, CIE 1976 UCS red field working definition, HDR explanatory text. License: W3C Document License 2023. Locator: Key Terms and Intent.",
+      "category_evidence": [
+        "B"
+      ]
+    },
+    {
+      "id": "wcag22-technique-g15",
+      "title": "G15: Using a tool to ensure that content does not violate the general flash threshold or red flash threshold",
+      "url": "https://www.w3.org/WAI/WCAG22/Techniques/general/G15",
+      "source_type": "w3c_technique",
+      "published_or_version": "Updated 2025-07-15",
+      "retrieved_at": "2026-07-26",
+      "sha256": "dd42a517982c73dff31ae5a66d53da0e49b41418005f74cf16ca906ab097cef9",
+      "status": "available",
+      "notes": "복합 점멸의 time-continuous tool 검사 기법. License: W3C Document License 2023. Locator: Description and Tests.",
+      "category_evidence": [
+        "B"
+      ]
+    },
+    {
+      "id": "wcag22-technique-g19",
+      "title": "G19: Ensuring that no component of the content flashes more than three times in any 1-second period",
+      "url": "https://www.w3.org/WAI/WCAG22/Techniques/general/G19",
+      "source_type": "w3c_technique",
+      "published_or_version": "Updated 2025-07-15",
+      "retrieved_at": "2026-07-26",
+      "sha256": "64c6c7c72009fcf9984c411a4c407f04dfee23699a7d2ff9691166b94166399f",
+      "status": "available",
+      "notes": "1초 3회와 정확히 3회일 때 시작 및 끝 light/dark state 검사 기법. License: W3C Document License 2023. Locator: Tests Procedure.",
+      "category_evidence": [
+        "B"
+      ]
+    },
+    {
+      "id": "wcag22-technique-g176",
+      "title": "G176: Keeping the flashing area small enough",
+      "url": "https://www.w3.org/WAI/WCAG22/Techniques/general/G176",
+      "source_type": "w3c_technique",
+      "published_or_version": "Updated 2025-07-15",
+      "retrieved_at": "2026-07-26",
+      "sha256": "9f982583616b6baeed01c1de815cf72db91edc02ab017099fdd0bf3cd86ce99b",
+      "status": "available",
+      "notes": "341 × 256 reference rectangle와 21,824 pixels small-safe-area 설명. License: W3C Document License 2023. Locator: Description, Formula 1, Tests Procedure.",
+      "category_evidence": [
+        "B"
+      ]
+    },
+    {
+      "id": "itu-r-bt1702-3",
+      "title": "Recommendation ITU-R BT.1702-3: Guidance for the reduction of photosensitive epileptic seizures caused by television",
+      "url": "https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.1702-3-202311-I!!PDF-E.pdf",
+      "source_type": "itu_recommendation_pdf",
+      "published_or_version": "Recommendation ITU-R BT.1702-3 (11/2023)",
+      "retrieved_at": "2026-07-26",
+      "sha256": "9d1167de5553a82c633020a44b5f729118e90ff6536a3b519f1813e235437bf2",
+      "status": "available",
+      "notes": "ITU 공식 영문 PDF. 원문 파일은 저장소에 넣지 않는다. Copyright © ITU 2023, all rights reserved. Locator: Annex 1 Guidelines 1 and 2, Attachment 1 to Annex 1, Annexes 2 and 4.",
+      "category_evidence": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "id": "ffmpeg-photosensitivity-601d9ee",
+      "title": "FFmpeg vf_photosensitivity.c",
+      "url": "https://github.com/FFmpeg/FFmpeg/blob/601d9ee881fbd9d9ff44466c561c480ff244eb9f/libavfilter/vf_photosensitivity.c",
+      "source_type": "fixed_commit_source_code",
+      "published_or_version": "FFmpeg master commit 601d9ee881fbd9d9ff44466c561c480ff244eb9f",
+      "retrieved_at": "2026-07-26",
+      "sha256": "4be61b30d16672cc87dc1f09399c40dea9fd9a5042a201aefe5f4639d6ed9c7b",
+      "status": "available",
+      "notes": "고정 commit의 libavfilter/vf_photosensitivity.c 원문. License: GNU LGPL 2.1 or later. Locator: options, convert_frame_partial, get_badness, filter_frame.",
+      "category_evidence": [
+        "D"
+      ]
+    },
+    {
+      "id": "trace-peat-official",
+      "title": "Photosensitive Epilepsy Analysis Tool (PEAT)",
+      "url": "https://trace.umd.edu/peat/",
+      "source_type": "official_product_page",
+      "published_or_version": "PEAT 1.6, download archive dated 2017-02-15; page retrieved 2026-07-27",
+      "retrieved_at": "2026-07-27",
+      "sha256": "f096f659ea8d961b0edd617bbd5de7a4e47b2c443d4728a2c0ae68fcd14e44ed",
+      "status": "available",
+      "notes": "Issuer: TRACE RERC, University of Maryland. Exact locators: Free download: Version 1.6; Restrictions on use; final NOTE. Terms: free resource for web designers and software developers, but use for commercially produced television, film, home entertainment, or gaming material is prohibited. PEAT is copyright Trace R&D Center and its PSEe engine is copyright Cambridge Research Systems Ltd.",
+      "category_evidence": [
+        "B",
+        "D",
+        "I"
+      ]
+    },
+    {
+      "id": "nomura-atf-patients-2000",
+      "title": "A new adaptive temporal filter: application to photosensitive seizure patients",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/11145469/",
+      "source_type": "primary_clinical_study_abstract",
+      "published_or_version": "Psychiatry and Clinical Neurosciences 54(6), 2000-12; PMID 11145469; DOI 10.1046/j.1440-1819.2000.00770.x",
+      "retrieved_at": "2026-07-27",
+      "sha256": "f138d4bd85671eb01d50ddfa328c5231f092a42ef0b6ba9658b96b3ba834a63d",
+      "status": "available",
+      "notes": "Issuer surface: NLM PubMed record for the primary study by Nomura et al. Exact locator: Abstract. Eleven photosensitive epilepsy patients were exposed to a four-second 12 Hz red/blue Pocket Monster scene on a 14-inch television at 2 m; all showed generalized PPR on the unfiltered scene and none on the adaptively filtered scene. PubMed supplies bibliographic metadata and abstract access, not a license to redistribute the publisher's full article; only the citation and atomic findings are recorded.",
+      "category_evidence": [
+        "C"
+      ]
+    },
+    {
+      "id": "saleem-incidence-india-1994",
+      "title": "Incidence of photosensitive epilepsy in unselected Indian epileptic population",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/8178629/",
+      "source_type": "primary_clinical_screening_study_abstract",
+      "published_or_version": "Acta Neurologica Scandinavica 89(1), 1994-01; PMID 8178629; DOI 10.1111/j.1600-0404.1994.tb01623.x",
+      "retrieved_at": "2026-07-27",
+      "sha256": "d5c9e8f81494f7aacc28a2cf2426e53bf26841a5a9a0076c3550f990a76f64ba",
+      "status": "available",
+      "notes": "Issuer surface: NLM PubMed record for the primary screening study by Saleem et al. Exact locator: Abstract. The study screened 1,000 unselected epilepsy patients from Northern India using clinical history and an IPS EEG protocol, finding six photosensitive patients; only three reported visually provoked seizures and the observed IPS response range was 6 to 60 cycles/s. PubMed does not grant redistribution rights for the publisher's full article.",
+      "category_evidence": [
+        "C"
+      ]
+    },
+    {
+      "id": "harding-wind-flicker-2008",
+      "title": "Wind turbines, flicker, and photosensitive epilepsy: characterizing the flashing that may precipitate seizures and optimizing guidelines to prevent them",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/18397297/",
+      "source_type": "primary_risk_modeling_study_abstract",
+      "published_or_version": "Epilepsia 49(6), 2008-06; PMID 18397297; DOI 10.1111/j.1528-1167.2008.01563.x",
+      "retrieved_at": "2026-07-27",
+      "sha256": "2e05ca05c8e6722340831793c7a25dbefb8fd5f0217805396a4731d1fcd09cc6",
+      "status": "available",
+      "notes": "Issuer surface: NLM PubMed record for the primary risk-modeling study by Harding, Harding and Wilkins. Exact locator: Abstract. The study applies contrast, frequency, mark-space ratio, retinal area and visual-cortex involvement to wind-turbine shadow flicker and argues that frequency should be limited to three flashes/s. This is an environment-specific model, not a clinical validation of FlashPatch or a universal safe-harbor. PubMed does not grant redistribution rights for the publisher's full article.",
+      "category_evidence": [
+        "C"
+      ]
+    },
+    {
+      "id": "jordan-pse-tool-conformance-2025",
+      "title": "Evaluating Conformance of Video Safety Tools for Photosensitive Epilepsy",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12249941/",
+      "source_type": "primary_methods_paper_author_manuscript",
+      "published_or_version": "Universal Access in Human-Computer Interaction 2025, LNCS 15780, pages 85-98; DOI 10.1007/978-3-031-93848-1_7; PMCID PMC12249941",
+      "retrieved_at": "2026-07-27",
+      "sha256": "f1bd4fd81794055909e3cde487eefae64077a898d1e847852d8a887a0eba59ac",
+      "status": "available",
+      "notes": "Issuer surface: NLM PubMed Central author manuscript by J. Bern Jordan. Exact locators: Abstract; 3.4 More Complex Tests; 4.4 Going Beyond Simple Alternating Frames; 4.5 Including Confounding Characteristics; 5 Open-Source Tool Development; 6 Conclusion. The manuscript says prior synthetic tests have low case coverage and specifies uneven timing, alternating-transition polarity, same-pixel overlap, asynchronous confounds, multi-frame transition duration and synchronization as validation cases. PMC access does not by itself grant redistribution of the publisher version; atomic findings and citation are recorded.",
+      "category_evidence": [
+        "D",
+        "E",
+        "F",
+        "G"
+      ]
+    },
+    {
+      "id": "kaya-pse-detection-correction-2025",
+      "title": "Detection and correction of the flashing parts that trigger photosensitive epilepsy in videos",
+      "url": "https://link.springer.com/article/10.1007/s11760-025-04608-4",
+      "source_type": "peer_reviewed_article_publisher_record",
+      "published_or_version": "Signal, Image and Video Processing 19, article 967; version of record 2025-09-05; DOI 10.1007/s11760-025-04608-4",
+      "retrieved_at": "2026-07-27",
+      "sha256": "143044383b7a88e701f2abf35ca0be5273eea52c925769640b17b7b587a3dc0b",
+      "status": "available",
+      "notes": "Issuer: Springer Nature. Exact locators: Abstract; Data availability; References; Rights and permissions. Only abstract and metadata were available without subscription at retrieval. The publisher record explicitly claims automatic detection and correction of offending video segments and links the authors' dataset and code. Full methods and results were access-controlled at retrieval. Springer Nature states exclusive article rights; no article redistribution right is inferred.",
+      "category_evidence": [
+        "D",
+        "F"
+      ]
+    },
+    {
+      "id": "samfatu-pse-detection-correction-0776ea3",
+      "title": "pse-detection-correction",
+      "url": "https://github.com/samfatu/pse-detection-correction/tree/0776ea3e6949a62d5becb8027a2765961b515793",
+      "source_type": "fixed_commit_source_code",
+      "published_or_version": "commit 0776ea3e6949a62d5becb8027a2765961b515793, 2026-06-01",
+      "retrieved_at": "2026-07-27",
+      "sha256": "5408c5b8d3e7ab47447902e9bdb4d370b0320c0d2fe8c5fb4511318121f16781",
+      "status": "available",
+      "notes": "Fixed-revision source archive hash. Exact locators: correction_engine.py general_correction_v1/v2, red_correction, both_correction, apply_correction and save; PhotosensitivitySafetyEngine/video_tools/video_censor.py; LICENSE; requirements.txt. BSD-3-Clause was added in 2026; the inspected correction code is byte-identical to commit 1599207 from 2023. compileall passed, but the advertised test script could not start in the clean audit interpreter because cv2 was absent, so no execution-performance claim is accepted.",
+      "category_evidence": [
+        "D",
+        "F",
+        "I"
+      ]
+    },
+    {
+      "id": "us11381715b2-photosensitivity-repair",
+      "title": "Computer method and apparatus making screens safe for those with photosensitivity",
+      "url": "https://patents.google.com/patent/US11381715B2/en",
+      "source_type": "granted_us_patent_record",
+      "published_or_version": "US 11,381,715 B2; priority 2018-07-16; filed 2019-06-24; published 2022-07-05; Google Patents status Active at retrieval",
+      "retrieved_at": "2026-07-27",
+      "sha256": "ab2f5b3a3d65cbb817482b26045478099e6c26e5682158a018c43875bc5c966d",
+      "status": "available",
+      "notes": "Issuer record: USPTO publication rendered by Google Patents. Exact locators: Abstract; Description sections Summary and consumer/business applications; Claims 1 and 11. The claims cover learning a transformation that removes an introduced auxiliary transformation and applying it to repair media to a target response metric. Patent status is a rights-screening signal, not a legal freedom-to-operate opinion.",
+      "category_evidence": [
+        "D",
+        "F",
+        "I"
+      ]
+    },
+    {
+      "id": "trace-pse-test-media-f8d3dac",
+      "title": "Photosensitive Epilepsy Test Media",
+      "url": "https://github.com/traceRERC/pse-test-media/tree/f8d3dac46fdeb1e0eb13cca481a511b149b74bbd",
+      "source_type": "fixed_commit_source_code_and_test_media_generator",
+      "published_or_version": "commit f8d3dac46fdeb1e0eb13cca481a511b149b74bbd, 2026-07-17",
+      "retrieved_at": "2026-07-27",
+      "sha256": "3ad63bc762da742b19fa0ffff89fdfe8da7323ae9f26f3e51533e99da793fe2c",
+      "status": "available",
+      "notes": "Fixed-revision source archive hash. The repository has a top-level BSD-3-Clause LICENSE, SHA-256 14fe5e2fc911993320085dac391e9ff96dc8eb8bb8d59e7f4131fcf2b1f7efe7. That fact does not yet prove an explicit license grant for generated video outputs or complete provenance of every incorporated input asset. Exact locators: README Introduction, Usage, Time-and-color patterns, Codec choice and color fidelity; video_creation manifests; make_single_video.py. Direct audit found 15 manifests and 306 labeled generation specifications. Current generator supports sRGB only, and generated media are hazardous test material rather than normal real-world negatives. Execution observations are preserved separately in docs/research/trace-pse-test-media-validation.json.",
+      "category_evidence": [
+        "E",
+        "G",
+        "I"
+      ]
+    },
+    {
+      "id": "epi-lens-a7c5ab9",
+      "title": "EPI-LENS",
+      "url": "https://github.com/Pi-0r-Tau/EPI-LENS/tree/a7c5ab95278e9c590324d6cb95b5f90982561f13",
+      "source_type": "fixed_commit_source_code_and_browser_tool",
+      "published_or_version": "commit a7c5ab95278e9c590324d6cb95b5f90982561f13, 2026-06-19; extension manifest 7.7",
+      "retrieved_at": "2026-07-27",
+      "sha256": "a08fed753f3bcae9b64b1ed1342923833bfafe8a571fbb3cee0ce1a07cdaa852",
+      "status": "available",
+      "notes": "Fixed-revision git archive hash. License: MIT, LICENSE SHA-256 9ac22cfbf8d2034dd43ea78b3fbfcae33668f86f17a0b719d70273328daae98e. Exact locators: README opening description, Compatibility, Core Metrics Overview and Updated Local/offline video analysis suite; manifest.json lines 1 to 85; analyzer.js lines 271 to 290 and 940 to 949; Offline/fileanalyzer-exporter.js. Direct audit checked all 50 tracked JavaScript files for parseability. The documented benchmark command failed because benchmark-helpers.js resolves helper paths beneath Generated tests although the helpers are at repository root, so no performance result is accepted. EPI-LENS analyzes YouTube and local video in the browser, invokes its flash-violation tracker from the analyzer, and exports measurement data; the inspected revision does not export a repaired video.",
+      "category_evidence": [
+        "D",
+        "I"
+      ]
+    },
+    {
+      "id": "flashguard-2507.19692v1",
+      "title": "FlashGuard: Novel Method in Evaluating Differential Characteristics of Visual Stimuli for Deterring Seizure Triggers in Photosensitive Epilepsy",
+      "url": "https://arxiv.org/abs/2507.19692v1",
+      "source_type": "research_preprint_fixed_version",
+      "published_or_version": "arXiv:2507.19692v1, submitted 2025-07-25 22:18:25 UTC",
+      "retrieved_at": "2026-07-27",
+      "sha256": "efef7001693d846965c18e1cef6d95079d5d93db70f7888875f124aef8efa8bb",
+      "status": "available",
+      "notes": "Author: Ishan Pendyala. SHA-256 is for the fixed-version PDF at https://arxiv.org/pdf/2507.19692v1. Exact locators: Sections II-D and II-E; Sections III-A through III-C; figures 1 through 6. The preprint uses arXiv's non-exclusive distribution license, not an open-source code or dataset license. It reports a 50 by 50 sampled trigger array, region interpolation, local darkening and 15-frame color averaging, but links no public code. Its 1,000-video synthetic dataset is not public and is available only by request.",
+      "category_evidence": [
+        "D",
+        "E",
+        "F",
+        "G",
+        "I"
+      ]
+    },
+    {
+      "id": "tooflashy-8274e1e",
+      "title": "TooFlashy",
+      "url": "https://github.com/hashb/TooFlashy/tree/8274e1ea09bd6099d384056f0fcb6fbc32cf0e3f",
+      "source_type": "fixed_commit_source_code_and_test_harness",
+      "published_or_version": "commit 8274e1ea09bd6099d384056f0fcb6fbc32cf0e3f, 2026-05-06; package 0.1.0",
+      "retrieved_at": "2026-07-27",
+      "sha256": "b375b1ebd88f88906e5c48b62645122feaef52cf743e84650117be530e9c2772",
+      "status": "available",
+      "notes": "Fixed-revision git archive hash. License: Apache-2.0, LICENSE SHA-256 c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4. Exact locators: README lines 3 to 32 and 56 to 66; src/tooflashy/analysis.py lines 73 to 132, 183 to 196, 253 to 282 and 298 to 445; src/tooflashy/cli.py lines 16 to 36; tests/conftest.py; tests/pse_media_cases.py lines 30 to 87. The clean advertised test command produced 21 passed, 1 skipped and 2 failed because its pinned TRACE revision contains 306 JSON specifications but no prebuilt AVI files; a focused algorithm and decoder subset produced 18 passed. Its encoded-video policy excludes 44 cases as unverifiable. Gemini Pro adversarial review passed the bounded capability and execution claim after removal of an unsupported comparative-strength phrase. Execution evidence: docs/research/tooflashy-validation.json.",
+      "category_evidence": [
+        "D",
+        "F",
+        "G",
+        "I"
+      ]
+    },
+    {
+      "id": "ofcom-itc-flashing-guidance-2002",
+      "title": "ITC Guidance Note for Licensees on Flashing Images and Regular Patterns in Television",
+      "url": "https://www.ofcom.org.uk/siteassets/resources/documents/tv-radio-and-on-demand/broadcast-guidance/gn_flash.pdf?v=324195",
+      "source_type": "historical_mirror_of_regulator_guidance",
+      "published_or_version": "revised and re-issued 2001-07; editorial amendment 2002-06",
+      "retrieved_at": "2026-07-28",
+      "sha256": null,
+      "status": "available",
+      "notes": "Issuer: Independent Television Commission guidance retained on Ofcom's official broadcast-guidance path. Exact locators: sections 3 and 3.1.1; sections 5 and 5.1; footnotes 1 to 3; Appendix I Luminance Measurement. Ofcom's current URL returned a Cloudflare 403 to the non-browser audit client. The exact-title 155061-byte PDF was retrieved from the historical MTV mirror at http://static.mtv.co.uk/tam/Ofcom_flashing_Imagery_and_Luminance_guidance.pdf and hashed as ffdae83e1db672f6e03621ea3ede75e032c3d38f3bb9b59c144aeca21290c4f2. The document itself contains no explicit redistribution license, and byte identity with the currently hosted Ofcom object is not claimed.",
+      "category_evidence": [
+        "B",
+        "I"
+      ]
+    },
+    {
+      "id": "obs-studio-repository",
+      "title": "OBS Studio Source Filter API and Pinned Video Filter Example",
+      "url": "https://docs.obsproject.com/reference-sources",
+      "source_type": "official_documentation_and_pinned_source",
+      "published_or_version": "OBS Studio 32.2.1 docs; obs-studio 0052d024fd6a5ff1aa04c76cbdffd3085a5dfacc",
+      "retrieved_at": "2026-07-29",
+      "sha256": "cc1468d6eddc7daba329ce6e392982936c27d9d8a1caddd7ef87ced65b9b2d03",
+      "status": "available",
+      "notes": "Official Source API documents filter source draw-call wrapping and obs_source_process_filter_begin/end. The pinned official test registers an OBS_SOURCE_TYPE_FILTER video source. This proves a filter interception point, not FlashPatch integration, temporal buffering, latency, or independent verification.",
+      "category_evidence": [
+        "H",
+        "I"
+      ]
+    },
+    {
+      "id": "ffmpeg-libavfilter-photosensitivity",
+      "title": "FFmpeg Photosensitivity Filter Source Code",
+      "url": "https://github.com/FFmpeg/FFmpeg/blob/master/libavfilter/vf_photosensitivity.c",
+      "source_type": "git_repository",
+      "published_or_version": "a5a54b3",
+      "retrieved_at": "2026-07-28",
+      "sha256": null,
+      "status": "available",
+      "notes": "FFmpeg photosensitivity filter detects luminance jumps across consecutive frames and applies global frame darkening.",
+      "category_evidence": [
+        "H",
+        "I"
+      ]
+    },
+    {
+      "id": "chromium-blink-accessibility-video",
+      "title": "Chrome Extensions tabCapture API and Chromium IDL",
+      "url": "https://developer.chrome.com/docs/extensions/reference/api/tabCapture.md.txt",
+      "source_type": "official_documentation_and_source",
+      "published_or_version": "Chrome Extensions tabCapture current docs; Chromium main tab_capture.idl",
+      "retrieved_at": "2026-07-29",
+      "sha256": "134781da04d7745eb98ff77e831f0e4e152f1a940f2f90f11feecfeaa6be0146",
+      "status": "available",
+      "notes": "Official Chrome documentation provides a user-invoked current-tab MediaStream capture seam and states activeTab and lifecycle restrictions. This proves an analysis input seam, not in-place replacement rendering or built-in photosensitivity detection and repair.",
+      "category_evidence": [
+        "H",
+        "I"
+      ]
+    },
+    {
+      "id": "flashpatch-single-maintainer-roadmap",
+      "title": "FlashPatch Single-Maintainer Roadmap & Fallback Execution Strategy",
+      "url": "https://github.com/sergiobuilds/flashpatch/blob/master/docs/GRAND-PRIZE-STRATEGY.md",
+      "source_type": "project_material",
+      "published_or_version": "2026-07-27_v2",
+      "retrieved_at": "2026-07-28",
+      "sha256": null,
+      "status": "available",
+      "notes": "Single-maintainer execution protocol specifying core scope boundaries, kill gates, and 2 fallback strategies.",
+      "category_evidence": [
+        "I",
+        "J"
+      ]
+    },
+    {
+      "id": "w3c-www-style-2011may-0687",
+      "title": "Re: [css-image] gradients, animations and photosensitive epilepsy",
+      "url": "https://lists.w3.org/Archives/Public/www-style/2011May/0687.html",
+      "source_type": "standards_consortium_archive",
+      "published_or_version": "2011-05",
+      "retrieved_at": "2026-07-28",
+      "sha256": null,
+      "status": "available",
+      "notes": "W3C www-style 공개 메일링 리스트 아카이브. CSS 애니메이션/그라디언트의 temporal luminance/chrominance 변환이 WCAG 2.2 SC 2.3.1 광과민성 위반을 유발할 수 있음을 규정화 논의한 1차 아카이브 원문이다.",
+      "category_evidence": [
+        "C",
+        "F"
+      ]
+    },
+    {
+      "id": "iso-9241-391-2016",
+      "title": "ISO 9241-391:2016 Ergonomics of human-system interaction - Part 391: Requirements, recommendations and guidance on spatial and temporal characteristics of visual displays to reduce the risk of photosensitive seizures",
+      "issuer": "ISO (International Organization for Standardization)",
+      "date": "2016-02",
+      "locator": "ISO 9241-391:2016(E)",
+      "url": "https://www.iso.org/standard/65942.html",
+      "license_terms": "ISO Copyright Standard (Proprietary specification; implementation boundary vectors extracted without text redistribution)",
+      "category_evidence": [
+        "B",
+        "F",
+        "G",
+        "I"
+      ],
+      "short_quote": "Defines spatial pattern hazards (stripe transitions >= 5 pairs in 10-degree visual field) and luminance/red flash thresholds for visual displays.",
+      "source_type": "official-standard",
+      "published_or_version": "2016-02",
+      "retrieved_at": "2026-07-28",
+      "sha256": null,
+      "status": "available",
+      "notes": "ISO Copyright Standard (Proprietary specification; implementation boundary vectors extracted without text redistribution) Defines spatial pattern hazards (stripe transitions >= 5 pairs in 10-degree visual field) and luminance/red flash thresholds for visual displays."
+    },
+    {
+      "id": "south2021-photosensitive-flashes",
+      "title": "Detecting and Defending Against Seizure-Inducing Flashes in Video (IEEE VIS 2021 / TVCG)",
+      "url": "https://vis.khoury.northeastern.edu/pubs/South2021DetectingDefendingSeizure/",
+      "source_type": "academic-paper",
+      "published_or_version": "IEEE TVCG 2021 / VIS 2021",
+      "retrieved_at": "2026-07-28",
+      "sha256": null,
+      "status": "available",
+      "notes": "Open-access preprint available at amypavel.com/papers/photosensitive.pdf. Evaluates automated flash detection variance across resolution/color changes.",
+      "issuer": "IEEE TVCG / Northeastern University",
+      "date": "2021-10",
+      "locator": "Abstract / Section 4 & 5",
+      "license_terms": "IEEE Copyright (Open access preprint on amypavel.com)",
+      "category_evidence": [
+        "D",
+        "F",
+        "G",
+        "I"
+      ],
+      "short_quote": "Evaluates existing automated tools for detecting seizure-inducing flashes in video and proposes user-centered mitigation strategies."
+    },
+    {
+      "id": "w3c-mediaqueries5-reduced-motion",
+      "title": "W3C Media Queries Level 5 - Section 11.2 prefers-reduced-motion",
+      "url": "https://www.w3.org/TR/mediaqueries-5/#prefers-reduced-motion",
+      "source_type": "official-standard",
+      "published_or_version": "W3C Working Draft",
+      "retrieved_at": "2026-07-28",
+      "sha256": null,
+      "status": "available",
+      "notes": "W3C Document License. Standardizes prefers-reduced-motion media feature.",
+      "issuer": "W3C (World Wide Web Consortium)",
+      "date": "2024-03",
+      "locator": "Section 11.2",
+      "license_terms": "W3C Software and Document License",
+      "category_evidence": [
+        "B",
+        "H",
+        "I"
+      ],
+      "short_quote": "The prefers-reduced-motion media feature is used to detect if the user has requested the system minimize non-essential motion."
+    },
+    {
+      "id": "xiph-video-test-media-corpus",
+      "title": "Xiph.Org DERF Video Test Media Collection",
+      "url": "https://media.xiph.org/video/derf/",
+      "source_type": "open-dataset",
+      "published_or_version": "DERF Y4M Collection",
+      "retrieved_at": "2026-07-28",
+      "sha256": null,
+      "status": "available",
+      "notes": "Collection of uncompressed Y4M video sequences. Used strictly for decoder and throughput benchmarking.",
+      "issuer": "Xiph.Org Foundation",
+      "date": "2024-01",
+      "locator": "Uncompressed Y4M test sequences",
+      "license_terms": "Mixed CC-BY / Public Domain / Legacy ITU-T test clip provenance",
+      "category_evidence": [
+        "E",
+        "G",
+        "I"
+      ],
+      "short_quote": "Uncompressed Y4M video test set for video processing and codec throughput evaluation."
+    },
+    {
+      "id": "itu-r-bt709-6",
+      "title": "Recommendation ITU-R BT.709-6: Parameter values for the HDTV standards for production and international programme exchange",
+      "url": "https://www.itu.int/rec/R-REC-BT.709-6-201506-I/en",
+      "source_type": "standard_specification",
+      "published_or_version": "Recommendation ITU-R BT.709-6 (06/2015)",
+      "retrieved_at": "2026-07-28",
+      "sha256": null,
+      "status": "available",
+      "notes": "Official ITU Recommendation defining HDTV relative luminance matrix (L = 0.2126 R + 0.7152 G + 0.0722 B). W3C WCAG 2.2 Relative Luminance and sRGB standards derive directly from BT.709 color primaries.",
+      "category_evidence": [
+        "B",
+        "I"
+      ]
+    },
+    {
+      "id": "apple-dim-flashing-lights-2023",
+      "title": "Apple Video Accessibility - Dim Flashing Lights Technical Feature & Guidelines",
+      "url": "https://support.apple.com/guide/mac-help/mchl4fb2ee6a/mac",
+      "source_type": "official_documentation",
+      "published_or_version": "macOS 13.3 / iOS 16.4 Accessibility Feature",
+      "retrieved_at": "2026-07-28",
+      "sha256": null,
+      "status": "available",
+      "notes": "Apple OS accessibility feature. Uses AVFoundation for real-time playback dimming of flashing lights during on-device display.",
+      "issuer": "Apple Inc.",
+      "date": "2023-03",
+      "locator": "Accessibility -> Vision -> Dim Flashing Lights",
+      "license_terms": "Proprietary Apple OS Feature Documentation",
+      "category_evidence": [
+        "B",
+        "D",
+        "H",
+        "I"
+      ],
+      "short_quote": "Video content that depicts flashing or strobing lights will be automatically dimmed."
+    },
+    {
+      "id": "game-accessibility-guidelines-flashing",
+      "title": "Game Accessibility Guidelines - Avoid Flickering Images and Repetitive Patterns",
+      "url": "https://gameaccessibilityguidelines.com/avoid-flickering-images-and-repetitive-patterns/",
+      "source_type": "industry_guideline",
+      "published_or_version": "Game Accessibility Guidelines (2024)",
+      "retrieved_at": "2026-07-28",
+      "sha256": null,
+      "status": "available",
+      "notes": "Industry guideline for video game rendering safety.",
+      "issuer": "International Game Developers Association Accessibility SIG",
+      "date": "2024-01",
+      "locator": "Visual -> Avoid flickering images and repetitive patterns",
+      "license_terms": "Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)",
+      "category_evidence": [
+        "B",
+        "H",
+        "I"
+      ],
+      "short_quote": "Ensure that no flickering images or repetitive spatial patterns exceed the 3 Hz or WCAG 2.2 SC 2.3.1 general and red flash thresholds during gameplay."
+    },
+    {
+      "id": "fisher-ilae-photosensitivity-consensus-2005",
+      "title": "International Consensus on Photosensitive Epilepsy: Stimulus Variables and Clinical Guidance",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/16029377/",
+      "source_type": "journal_article",
+      "published_or_version": "Epilepsia, Vol 46, Issue 9, 2005 (pp. 1426-1441)",
+      "retrieved_at": "2026-07-28",
+      "sha256": "a9d18e473215ef82bfb214999a4c0792348a12903112c8fe95a706b8b0e8b15a",
+      "status": "available",
+      "notes": "Open access PubMed indexed consensus guideline by ILAE Task Force on Photosensitivity. Category C medical baseline.",
+      "category": "C",
+      "category_evidence": [
+        "C"
+      ]
+    },
+    {
+      "id": "parallel-realtime-photosensitive-seizure-detection-2016",
+      "title": "Parallel scheme for real-time detection of photosensitive seizures in video streams",
+      "url": "https://www.sciencedirect.com/science/article/abs/pii/S0010482516000123",
+      "source_type": "journal_article",
+      "published_or_version": "Computers in Biology and Medicine, Vol 72, 2016 (pp. 210-221)",
+      "retrieved_at": "2026-07-28",
+      "sha256": "3b8110a08e1781216d790d9f2e3a1bf728bb1878d65cf96a92842e92c43105d1",
+      "status": "available",
+      "notes": "Peer-reviewed research on GPU/parallel detection architecture for photosensitive hazards. Category F detection prior art.",
+      "category": "F",
+      "category_evidence": [
+        "F"
+      ]
+    },
+    {
+      "id": "ilae-2005-consensus-definition",
+      "title": "Epileptic Seizures and Epilepsy: Definitions Proposed by the International League Against Epilepsy (ILAE) and the International Bureau for Epilepsy (IBE)",
+      "url": "https://onlinelibrary.wiley.com/doi/10.1111/j.0013-9580.2005.66104.x",
+      "source_type": "medical_consensus_journal_article",
+      "published_or_version": "Epilepsia, 46(4):470–472, 2005",
+      "retrieved_at": "2026-07-28",
+      "sha256": null,
+      "status": "available",
+      "notes": "ILAE 2005 공식 합의 성명서는 광과민성 발작(Photosensitive Seizures) 및 유발 발작의 정식 의학적 정의와 3~30 Hz 시각적 자극 반응 대역을 제시한다. 이를 탐지 센서 감도 스펙트럼 수식에 보조 지표로 반영하되, WCAG/ITU 표준 하드 게이트의 상위 개념으로 확장하거나 의료 예방 보장으로 과대주장하지 않는다.",
+      "category_evidence": [
+        "C",
+        "I"
+      ]
+    },
+    {
+      "id": "blender-sintel-ccby3",
+      "title": "Sintel Open Movie Sharing and License",
+      "url": "https://durian.blender.org/sharing/",
+      "source_type": "official_project_license_page",
+      "published_or_version": "Sintel Open Movie, Blender Foundation (2010)",
+      "retrieved_at": "2026-07-28",
+      "sha256": null,
+      "status": "available",
+      "notes": "Blender Foundation의 Sintel Open Movie 프로젝트는 영화 본편과 제작 데이터 전체를 Creative Commons Attribution 3.0 Unported (CC BY 3.0) 라이선스로 배포한다. 급격한 광원 및 카메라 이동 씬을 정상 함정군(Normal Trap Corpus)으로 활용하며 source URL, attribution, timecode, hash를 manifest에 남긴다.",
+      "category_evidence": [
+        "E",
+        "I"
+      ]
+    },
+    {
+      "id": "blender-tears-of-steel-ccby3",
+      "title": "Tears of Steel Open Movie About and Licensing",
+      "url": "https://mango.blender.org/about/",
+      "source_type": "official_project_license_page",
+      "published_or_version": "Tears of Steel Open Movie, Blender Institute",
+      "retrieved_at": "2026-07-29",
+      "sha256": "1013fce4ca435c9a4f5c0cadb3d007a6c99b4ff665f2726099e439d967e956ae",
+      "status": "available",
+      "notes": "Supervisor directly retrieved and hashed the official Mango About page. Its Sharing section says: 'Tears of Steel is licensed as Creative Commons Attribution 3.0, which allows you to share and show the film freely, for as long you keep the credit scroll included.' This confirms redistribution of the film subject to the stated attribution condition. It does not explicitly license every separately hosted source-footage, CGI-asset, studio-file, derivative clip, or download variant; those require file-level verification before corpus inclusion.",
+      "category_evidence": [
+        "E",
+        "I"
+      ]
+    },
+    {
+      "id": "netflix-vmaf-e9909adb",
+      "title": "Netflix VMAF Fixed Revision: Full-Reference Video Quality Metric",
+      "url": "https://github.com/Netflix/vmaf/tree/e9909adb89306a270d9c78207bd12acf730279ad",
+      "source_type": "fixed_commit_official_source_code_and_documentation",
+      "published_or_version": "Netflix/vmaf commit e9909adb89306a270d9c78207bd12acf730279ad",
+      "retrieved_at": "2026-07-29",
+      "sha256": "23bdf24c9b0cef101571c4f27f72c59e1ffee18475e7ec258419e8106bac7ae9",
+      "status": "available",
+      "notes": "Supervisor cloned the fixed official revision. README.md SHA-256 is recorded above; LICENSE SHA-256 is a6fdb51d02b9dfe198e55534bb8047fe6d756eda117f4ff83de98f92c1952710. README lines 8 and 26 identify VMAF as Netflix's perceptual video-quality assessment algorithm and state BSD+Patent licensing; libvmaf/README.md line 129 states that VMAF is full-reference and is calculated on reference/distorted picture pairs. The official source does not validate photosensitivity safety, gold masks, repair locality, corpus split fairness, or a sealed benchmark runner.",
+      "category_evidence": [
+        "G",
+        "I"
+      ]
+    },
+    {
+      "id": "blender-sintel-trailer-file-2026-07-29",
+      "title": "Sintel Official Trailer, File-Level Corpus Record",
+      "url": "https://download.blender.org/durian/trailer/sintel_trailer-480p.mp4",
+      "source_type": "official_project_video_file",
+      "published_or_version": "Sintel trailer, 854x480 H.264/AAC, 24 fps, 52.208333 seconds",
+      "retrieved_at": "2026-07-29",
+      "sha256": "b670602fa00934ca27c4351bb0efe7ea7a07fae57284e44226025eeed7c51254",
+      "status": "available",
+      "notes": "Supervisor directly downloaded the exact 4,372,373-byte MP4 from download.blender.org after a 200 video/mp4 response. The official Durian Sharing page was directly retrieved and hashed as 67f30f30c55022c6f7de66beb997f04117b24f7aca928a912286a53edaa4b627. Its Sharing section says Durian project results, including online-published data and website contents unless clearly indicated otherwise, are CC BY 3.0 and may be reused and distributed commercially with proper attribution. For non-movie use it specifies Blender Foundation / www.sintel.org attribution; excluded logos, trademarks and clearly non-Durian material remain excluded. This record approves only this exact trailer byte sequence as a normal-video candidate with no hazard label. It does not approve the full film, alternative encodes, other assets, annotations, or any project-wide file set.",
+      "category_evidence": [
+        "E",
+        "I"
+      ]
+    },
+    {
+      "id": "mlcommons-inference-test01-fair-baseline-contract-22a2c214",
+      "title": "MLCommons Inference TEST01 Accuracy-in-Performance Compliance Contract",
+      "url": "https://github.com/mlcommons/inference/tree/22a2c21426bc2a63739b879ef4716bf5d706dcbe/compliance/TEST01",
+      "source_type": "fixed_commit_official_benchmark_compliance_runner",
+      "published_or_version": "MLCommons inference commit 22a2c21426bc2a63739b879ef4716bf5d706dcbe",
+      "retrieved_at": "2026-07-29",
+      "sha256": "267b370c4b753c42caaef2b6546182b7f5328e9b56276a52b059cafd320a0d47",
+      "status": "available",
+      "notes": "Supervisor directly retrieved the fixed official TEST01 README and run_verification.py. README lines 14-22 require sampled performance-mode results to match accuracy-mode results, require performance within 10%, and derive sampled output from audit.config. Lines 33-38 construct a baseline from exactly the compliance-run QSL indices for an apples-to-apples comparison; lines 71-76 require retained baseline and compliance score artifacts within the stated delta. run_verification.py lines 100-142 calls verify_accuracy.py, persists verify_accuracy.txt, and recognizes only TEST PASS. This is generic ML-inference compliance, not a sealed hidden holdout, video-safety evaluation, or FlashPatch performance evidence.",
+      "category_evidence": [
+        "G"
+      ]
+    },
+    {
+      "id": "blender-tears-of-steel-download-page-2026-07-29",
+      "title": "Tears of Steel Official Download Page, File Availability Audit",
+      "url": "https://mango.blender.org/download/",
+      "source_type": "official_project_download_page",
+      "published_or_version": "Tears of Steel download page, retrieved 2026-07-29",
+      "retrieved_at": "2026-07-29",
+      "sha256": "8161ddab7a1a0d07cc2d87f11917e9189d48b026c937c5abc920e77966bc1d94",
+      "status": "available",
+      "notes": "Supervisor directly fetched the official page. It says the links are from 2012, many may have expired, and directs users to the Netherlands mirror when in doubt. The page identifies https://download.blender.org/demo/movies/ToS/ToS-4k-1920.mov as a current full-movie link, but direct retrieval on 2026-07-29 returned HTTP 404; https://download.blender.org/demo/movies/ToS/tears_of_steel_surround.webm and the listed NLUUG 1080p/4k mirror links also returned HTTP 404. The official CC BY 3.0 film grant therefore cannot yet bind any retrievable file bytes or a manifest SHA-256.",
+      "category_evidence": [
+        "E",
+        "I"
+      ]
+    }
+  ]
+}

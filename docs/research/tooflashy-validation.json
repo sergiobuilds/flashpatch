@@ -1,0 +1,45 @@
+{
+  "version": "2026-07-27_v1",
+  "subject": {
+    "repository": "https://github.com/hashb/TooFlashy",
+    "commit": "8274e1ea09bd6099d384056f0fcb6fbc32cf0e3f",
+    "commit_date": "2026-05-06T20:14:46+05:30",
+    "git_archive_sha256": "b375b1ebd88f88906e5c48b62645122feaef52cf743e84650117be530e9c2772",
+    "license": "Apache-2.0",
+    "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  "advertised_suite": {
+    "command": "uv sync --dev --frozen && .venv/bin/python -m pytest -q",
+    "exit_code": 1,
+    "passed": 21,
+    "failed": 2,
+    "skipped": 1,
+    "failure_reason": "The TooFlashy test fixture pins TRACE commit edf799a15cc1a8817a58c0120a7b25b2b28a1932, which contains 306 JSON specifications and zero prebuilt AVI files. Both failures assert that expected AVI files exist."
+  },
+  "focused_suite": {
+    "command": ".venv/bin/python -m pytest -q tests/test_paper_algorithms.py tests/test_transition_duration.py tests/test_transition_timing.py tests/test_synchronization.py tests/test_nhk_jba_thresholds.py tests/test_ffmpeg_reader.py",
+    "exit_code": 0,
+    "passed": 18,
+    "failed": 0
+  },
+  "encoded_video_policy": {
+    "known_unverifiable_case_count": 44,
+    "locator": "tests/pse_media_cases.py lines 30 to 87",
+    "documented_classes": [
+      "encoded threshold collapse",
+      "count-rule conflict",
+      "red-flash fixture conflict"
+    ]
+  },
+  "adversarial_review": {
+    "provider_surface": "OpenCodex local proxy",
+    "model": "google-antigravity/gemini-3.1-pro",
+    "first_pass": false,
+    "first_pass_issue": "Removed an unsupported claim that TooFlashy was stronger than an unspecified global score baseline and made the full commit evidence explicit.",
+    "final_pass": true,
+    "final_factual_errors": [],
+    "final_overclaims": [],
+    "final_missing_qualifiers": []
+  },
+  "verdict": "TooFlashy is an accessible detection baseline, not a correction or independent-verifier baseline. Compare it on source-controlled vectors and separately generated, hash-bound encoded media; do not derive benchmark superiority from its current advertised suite."
+}

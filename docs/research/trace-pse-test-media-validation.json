@@ -1,0 +1,39 @@
+{
+  "version": "2026-07-27_v1",
+  "observed_at": "2026-07-27",
+  "upstream": {
+    "repository": "https://github.com/traceRERC/pse-test-media",
+    "commit": "f8d3dac46fdeb1e0eb13cca481a511b149b74bbd",
+    "archive_sha256": "3ad63bc762da742b19fa0ffff89fdfe8da7323ae9f26f3e51533e99da793fe2c",
+    "license_file_sha256": "14fe5e2fc911993320085dac391e9ff96dc8eb8bb8d59e7f4131fcf2b1f7efe7"
+  },
+  "environment": {
+    "python": "3.11",
+    "opencv_python": "5.0.0",
+    "numpy": "2.4.6",
+    "pillow": "12.3.0"
+  },
+  "fixture": "video_creation/trace24_30fps_01/f001f034.json",
+  "unactivated_path_probe": {
+    "command": "/tmp/flashpatch-audit/venv/bin/python ./make_single_video.py ./video_creation/trace24_30fps_01/f001f034.json",
+    "process_exit_code": 0,
+    "output_file_created": false,
+    "observed_child_error": "ModuleNotFoundError: No module named 'cv2'",
+    "observed_failed_child": "python generate_video.py ./video_creation/trace24_30fps_01/f001f034.json",
+    "log_sha256": "dbc9ab09d7d81e39ea36023a67e37dd4bccbb32ffbac023fdef57e43a40cc83b",
+    "interpretation": "The wrapper catches the failed child process and still exits zero. Exit status alone is not an acceptance signal."
+  },
+  "activated_path_probe": {
+    "command": "PATH=/tmp/flashpatch-audit/venv/bin:$PATH /tmp/flashpatch-audit/venv/bin/python ./make_single_video.py ./video_creation/trace24_30fps_01/f001f034.json",
+    "process_exit_code": 0,
+    "output_file_created": true,
+    "output_sha256": "e739c5b5e1f42e62e48f99fb93c5240271697b7279cfbb37de1452348af94c7e",
+    "output_bytes": 238286,
+    "frames": 44,
+    "fps": 30.0,
+    "width": 1920,
+    "height": 1080,
+    "log_sha256": "7e54088d42910b6724e6deadcda96c2cbaf7d474e8954abc64d079bcfd5c763c"
+  },
+  "rights_boundary": "The repository LICENSE covers the repository distribution. This audit does not yet confirm whether generated video outputs have an explicit independent license grant or whether every input asset has complete provenance for derived-media redistribution."
+}
