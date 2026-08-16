@@ -1,0 +1,108 @@
+{
+  "ea-iris": {
+    "cases": [
+      {
+        "case_id": "sealed-real-sintel-opening",
+        "expected_hazardous": false,
+        "hazardous": false,
+        "luminance_failed_frames": 0,
+        "overall_result": "Pass",
+        "pattern_failed_frames": 0,
+        "red_failed_frames": 0,
+        "results": []
+      },
+      {
+        "case_id": "sealed-synthetic-red",
+        "expected_hazardous": true,
+        "hazardous": true,
+        "luminance_failed_frames": 5,
+        "overall_result": "Fail",
+        "pattern_failed_frames": 0,
+        "red_failed_frames": 5,
+        "results": [
+          "LuminanceFlashFailure",
+          "RedFlashFailure"
+        ]
+      },
+      {
+        "case_id": "sealed-transformed-red-vfr",
+        "expected_hazardous": true,
+        "hazardous": true,
+        "luminance_failed_frames": 5,
+        "overall_result": "Fail",
+        "pattern_failed_frames": 0,
+        "red_failed_frames": 5,
+        "results": [
+          "LuminanceFlashFailure",
+          "RedFlashFailure"
+        ]
+      }
+    ],
+    "runs_equal": true
+  },
+  "epi-lens": {
+    "cases": [
+      {
+        "case_id": "sealed-real-sintel-opening",
+        "expected_hazardous": false,
+        "hazardous": false,
+        "total_flashes": 0,
+        "violation_count": 0
+      },
+      {
+        "case_id": "sealed-synthetic-red",
+        "expected_hazardous": true,
+        "hazardous": false,
+        "total_flashes": 0,
+        "violation_count": 0
+      },
+      {
+        "case_id": "sealed-transformed-red-vfr",
+        "expected_hazardous": true,
+        "hazardous": false,
+        "total_flashes": 0,
+        "violation_count": 0
+      }
+    ],
+    "runs_equal": true
+  },
+  "performance_evidence": {
+    "ea-iris_ms": [
+      [
+        13.63824398140423,
+        9.11197901587002,
+        16.999606013996527
+      ],
+      [
+        9.421791997738183,
+        16.52722799917683,
+        15.988113998901099
+      ]
+    ],
+    "epi-lens_ms": [
+      [
+        46.199250005884096,
+        39.982346002943814,
+        48.68830199120566
+      ],
+      [
+        44.672969001112506,
+        41.90335999010131,
+        39.29906102712266
+      ]
+    ],
+    "measurement": "wall-clock milliseconds for two direct adapter runs; capacity evidence only"
+  },
+  "runs_equal": true,
+  "schema": "flashpatch-external-detection-v1",
+  "source": {
+    "ea-iris_bridge": "iris-pse-detection==1.1.2",
+    "ea-iris_bridge_revision": "7e2ff32e34df1b86e4f3874ebabeb9d324e93269",
+    "ea-iris_bridge_wheel_sha256": "633517f6a24dde5288bbdce59b7bed3eba3e9d9a115a7f9a9e7323f13e15fdef",
+    "ea-iris_git_archive_sha256": "656e335f4f9b8bcc8dd7affee4cd9a3db1672b4813e123bc71ab088325a9eaca",
+    "ea-iris_revision": "d96978ac1107f3463b77f69a9c1b1ec5d45291a0",
+    "epi-lens_git_archive_sha256": "a08fed753f3bcae9b64b1ed1342923833bfafe8a571fbb3cee0ce1a07cdaa852",
+    "epi-lens_revision": "a7c5ab95278e9c590324d6cb95b5f90982561f13",
+    "epi-lens_runner": "official avgBrightness.js plus flashViolation.js, threshold 0.2 from analyzer.js"
+  }
+}

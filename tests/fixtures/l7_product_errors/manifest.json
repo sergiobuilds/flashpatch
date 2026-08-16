@@ -1,0 +1,32 @@
+{
+  "schema": "flashpatch-l7-product-provenance-v2",
+  "source": {
+    "historical_score_receipt": "artifacts/l7/score-receipt.json",
+    "gold_return": "artifacts/l7/gold-intake/ea-iris-native-main-v7-gold-return-v1"
+  },
+  "cases": [
+    {
+      "id": "gchess-fn",
+      "blind_case_id": "blind-23583b652b8c31faa39089555f8fee97",
+      "fixture": "gchess-blind-23583b652b8c31faa39089555f8fee97.npz",
+      "sha256": "8ecebe5ce8d6c478c768a7b758a4559d421486be084f71fbaed76d5f782d27e3",
+      "gold_decision": "HAZARDOUS",
+      "gold_interval_seconds": [0.0, 0.55],
+      "flashpatch_observation": "SAFE",
+      "classification": "GOLD_CAPTURE_CONFLICT_REQUIRES_REVIEW",
+      "capture_facts": {"unique_frames": 1, "adjacent_frame_changes": 0},
+      "fresh_l7": {"run_id": "20260810-8f11da0", "contract_sha256": "88bd5a13aecdc3a5bcfba4d2e0b53d2e7745c8b89a0a8cacc0f4e3efddd73069", "repeat_receipts_sha256": "13d908507342501ef1d4c67c0add914f877b3ad591e6aeb5684408b783feec14"}
+    },
+    {
+      "id": "super-mario-solar-engine-fp",
+      "blind_case_id": "blind-1f16ef6168ce276bc5f7da2fa7e18d01",
+      "fixture": "super-mario-solar-engine-blind-1f16ef6168ce276bc5f7da2fa7e18d01.npz",
+      "sha256": "7e50d112ca071a01e1b404459fd0eaebbfa2f169861e35b6cf19f521903bcd2d",
+      "gold_decision": "SAFE",
+      "gold_interval_seconds": [],
+      "flashpatch_observation": "SAFE",
+      "classification": "RESOLVED_HISTORICAL_FALSE_POSITIVE",
+      "fresh_l7": {"run_id": "20260810-8f11da0", "contract_sha256": "88bd5a13aecdc3a5bcfba4d2e0b53d2e7745c8b89a0a8cacc0f4e3efddd73069", "repeat_receipts_sha256": "faaa30ca053cccd2218969143f6a7fc1e60bbf650d961ddc29168eb6c245e6d9"}
+    }
+  ]
+}

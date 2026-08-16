@@ -1,0 +1,9 @@
+{
+  "decoder": "opencv-videoio",
+  "decoder_agreement": true,
+  "disagreement_reasons": [],
+  "input": "benchmarks/minimal-local-repair/repaired.mp4",
+  "max_affected_fraction": 0.040364583333333336,
+  "max_transition_count": 11,
+  "passed": true
+}

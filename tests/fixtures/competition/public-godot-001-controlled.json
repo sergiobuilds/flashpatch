@@ -1,0 +1,11 @@
+{
+  "case_id": "public-godot-001-controlled",
+  "decision": "PASS",
+  "patch": {"parameter": "flash_intensity"},
+  "source_file": "main.gd",
+  "source_line": 12,
+  "exported_parameter": "flash_intensity",
+  "factual_value": 2.0,
+  "candidate_value": 0.5,
+  "diff_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}

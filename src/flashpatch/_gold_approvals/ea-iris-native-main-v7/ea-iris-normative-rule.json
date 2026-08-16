@@ -1,0 +1,6 @@
+{
+  "input": "blinded rendered RGB frames materialized as FFV1 rgb24 at 60fps",
+  "oracle": "EA_IRIS_RELEASE_1_1_0_FD3E09E_UBUNTU",
+  "pattern_detection": true,
+  "rubric": "wcag22-g19-v1"
+}

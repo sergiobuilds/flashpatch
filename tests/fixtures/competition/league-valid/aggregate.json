@@ -1,0 +1,10 @@
+{
+  "schema": "flashpatch-blind-league-aggregate-v1",
+  "scores": {
+    "A": 8,
+    "B": 7,
+    "C": 6
+  },
+  "seal": "SEALED",
+  "sealed_assignment_sha256": "1bb7b8226e66e1d67a6e45be0190f09a00376d3612332f4a20442b0f72eb762d"
+}

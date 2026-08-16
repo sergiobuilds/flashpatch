@@ -1,0 +1,25 @@
+{
+  "changed_fraction": 0.24739583333333334,
+  "color_metadata_preserved": true,
+  "display_dimensions": [
+    32,
+    24
+  ],
+  "fallback_used": false,
+  "frame_count": 60,
+  "hazard_band_power_after": 0.0003783684071563184,
+  "hazard_band_power_before": 0.023675097486278694,
+  "input": "benchmarks/minimal-local-repair/source.mp4",
+  "input_hazardous": true,
+  "input_sha256": "ff26047d62ccdef90c68b5605930c597317559ef7bf57453d59256b981a1c190",
+  "output": "benchmarks/minimal-local-repair/repaired.mp4",
+  "output_sha256": "3ceee65a2eab88af7edd7a761429d041b64caf0d7d6fc048b94a8c8f36a8edaf",
+  "output_verified": true,
+  "outside_hazard_unchanged": true,
+  "profile": "wcag22-general-flash-file-v1",
+  "receipt_payload_sha256": "2c85cfe7b77baaa0739d72db7f4198ef8cd10daf26329ec35fc3460f13af0191",
+  "repair_verified": true,
+  "status": "VERIFIED",
+  "structural_similarity": 0.2501981398729,
+  "timestamp_preserved": true
+}

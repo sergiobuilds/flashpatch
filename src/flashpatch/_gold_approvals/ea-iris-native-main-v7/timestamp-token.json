@@ -1,0 +1,10 @@
+{
+  "approved_at": "2026-08-04T04:39:30Z",
+  "schema": "flashpatch-l7-external-approval-timestamp-v1",
+  "signature_algorithm": "Ed25519",
+  "signature_base64": "d9X3VfLeo88Pbm4TPJ5yr2q09V8ENimnw6iiGFrH8iWvAPtRp1Pm/MT8uGD0vBOn05e3un/kLbnaVZeGOKfTDw==",
+  "subject_approval_record_sha256": "a97e137aeac77432873375934b998940ec1782516b2ff6be6a74ee53186a424d",
+  "subject_policy_sha256": "220958b8a70a06fd132770e46158fa58a8c793717ebd96251a520c38cfd39eb0",
+  "timestamp_authority_id": "ea-iris-policy-timestamp-authority",
+  "token_serial": "tsa-98dc3ecb3a144761166c5e39a04f2adf"
+}
