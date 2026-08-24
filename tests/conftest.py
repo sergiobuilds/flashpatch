@@ -56,7 +56,9 @@ def pytest_runtest_makereport(item, call):
 
 # 내부 저장소의 MASTER-MAP과 git 이력에 결박된 검사들이다. 공개 저장소에는 그 지도와
 # 커밋이 없으므로 실행 자체가 성립하지 않는다. 목록을 눈에 보이게 고정해 둔다.
-MAP_BOUND_TESTS = {
+PRIVATE_INPUT_BOUND_TESTS = {
+    "tests/test_baseline_league.py::test_baseline_league_verifies_equal_budgets_and_compiler_wins",
+    "tests/test_baseline_league.py::test_baseline_league_rejects_episode_budget_overrun",
     "tests/test_competition.py::test_l6_placeholder_cannot_be_presented_as_renderer_evidence",
     "tests/test_competition.py::test_preflight_writes_hash_bound_p0_checkpoint_and_rejects_stale_revision",
     "tests/test_l6_plan.py::test_l6_seed_is_bound_exclusively_to_its_master_map_leaf",
@@ -68,6 +70,12 @@ MAP_BOUND_TESTS = {
     "tests/test_l7_plan.py::test_l7_plan_commit_is_an_ancestor_and_contains_the_bound_plan",
     "tests/test_l7_plan.py::test_l7_authority_allows_narrative_map_status_mutation",
     "tests/test_l7_plan.py::test_l7_authority_uses_one_pinned_byte_read_for_plan_and_map",
+    "tests/test_l7_durable_orchestrator.py::test_execution_contract_explicitly_binds_detector_and_threshold_helpers",
+    "tests/test_l7_durable_orchestrator.py::test_docker_executor_forwards_https_provenance",
+    "tests/test_l7_durable_orchestrator.py::test_external_transport_bundle_uses_the_actual_readonly_checkout_path",
+    "tests/test_l7_durable_orchestrator.py::test_assembly_phase_closes_before_finalizing_the_run",
+    "tests/test_l7_durable_orchestrator.py::test_canonical_publication_rejects_a_nonfinal_run",
+    "tests/test_l7_durable_orchestrator.py::test_resume_rederives_contract_before_removing_an_incomplete_case",
     "tests/test_release_supply_chain.py::test_release_bundle_is_licensed_reproducible_and_hash_verified",
     "tests/test_submission_package.py::test_submission_package_fixed_readback",
 }
@@ -80,5 +88,5 @@ def pytest_collection_modifyitems(config, items):
         return
     skip = pytest.mark.skip(reason="내부 MASTER-MAP과 커밋 이력에 결박된 검사입니다")
     for item in items:
-        if item.nodeid in MAP_BOUND_TESTS:
+        if item.nodeid in PRIVATE_INPUT_BOUND_TESTS:
             item.add_marker(skip)

@@ -25,3 +25,6 @@ keys/
 libpkgconf3_*.deb
 src/flashpatch/l9_claim.py
 scripts/
+!/scripts/
+/scripts/*
+!/scripts/check_public_release.py

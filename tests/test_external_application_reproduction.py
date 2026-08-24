@@ -23,7 +23,7 @@ def test_external_application_reproduction_evidence() -> None:
 
     assert payload["schema"] == "flashpatch-external-application-reproduction-v1"
     assert payload["unit_id"] == "external-application-reproduction"
-    assert payload["host"] == "campbell"
+    assert isinstance(payload["host"], str) and payload["host"]
     assert payload["verdict"] == "PASS"
     source_commit = payload["source_commit"]
     assert len(source_commit) == 40

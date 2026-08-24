@@ -1,0 +1,9 @@
+{
+  "fixed_fps": 60,
+  "actions": [
+    {"frame": 0, "charge": true},
+    {"frame": 1},
+    {"frame": 2, "fire": true},
+    {"frame": 3}
+  ]
+}

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+from importlib import resources
 import json
 from pathlib import Path
 import shutil
@@ -236,7 +237,7 @@ def _repair_file(source: Path, destination: Path, receipt_path: Path) -> dict[st
 
 def _run_safety_demo(output: Path) -> dict[str, object]:
     candidates = [Path.cwd(), Path(__file__).resolve().parents[2]]
-    smoke = next(
+    smoke: Path | None = next(
         (
             root / "benchmarks" / "aigame-psebench" / "corpus" / "interaction-burst"
             for root in candidates
@@ -245,7 +246,11 @@ def _run_safety_demo(output: Path) -> dict[str, object]:
         None,
     )
     if smoke is None:
-        raise RuntimeError("safety demo requires the source checkout benchmark fixtures")
+        packaged = resources.files("flashpatch").joinpath("_demo", "interaction-burst")
+        if packaged.joinpath("flashpatch.contract.json").is_file():
+            smoke = Path(str(packaged))
+    if smoke is None:
+        raise RuntimeError("safety demo fixture is missing from the installed package")
     contract = smoke / "flashpatch.contract.json"
     output.mkdir(parents=True, exist_ok=True)
     passed = compile_project(smoke, contract, workspace=output / "pass-work")

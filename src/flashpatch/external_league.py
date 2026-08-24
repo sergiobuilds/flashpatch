@@ -49,7 +49,7 @@ class ExternalLeagueError(ValueError):
 
 
 def _uv_executable() -> Path:
-    """Resolve uv from the executing host instead of binding EliteDesk's home."""
+    """Resolve uv from the executing host instead of binding a developer home."""
     executable = shutil.which("uv")
     return Path(executable).resolve() if executable else Path("uv")
 

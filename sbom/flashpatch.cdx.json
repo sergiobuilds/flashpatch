@@ -1,0 +1,82 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:681ba501-e572-5dd6-aa13-05b37c7be970",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "type": "application",
+      "bom-ref": "pkg:pypi/flashpatch@0.1.0",
+      "name": "flashpatch",
+      "version": "0.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:pypi/flashpatch@0.1.0"
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/av",
+      "name": "av",
+      "purl": "pkg:pypi/av",
+      "properties": [
+        {
+          "name": "flashpatch:declared-requirement",
+          "value": "av>=18"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/numpy",
+      "name": "numpy",
+      "purl": "pkg:pypi/numpy",
+      "properties": [
+        {
+          "name": "flashpatch:declared-requirement",
+          "value": "numpy>=1.26"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/opencv-python-headless",
+      "name": "opencv-python-headless",
+      "purl": "pkg:pypi/opencv-python-headless",
+      "properties": [
+        {
+          "name": "flashpatch:declared-requirement",
+          "value": "opencv-python-headless>=4.10"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:pypi/flashpatch@0.1.0",
+      "dependsOn": [
+        "pkg:pypi/av",
+        "pkg:pypi/numpy",
+        "pkg:pypi/opencv-python-headless"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/av",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/numpy",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/opencv-python-headless",
+      "dependsOn": []
+    }
+  ]
+}

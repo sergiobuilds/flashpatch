@@ -74,6 +74,13 @@ def test_installed_cli_and_ci_contract_are_executable() -> None:
     assert "pytest -q" in workflow
     assert "flashpatch safety-demo" in workflow
     assert "flashpatch demo" not in workflow
+    boundary = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "check_public_release.py"), "--root", str(ROOT)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert "public release audit passed" in boundary.stdout
 
 
 @pytest.mark.skipif(not _godot_runtime_available(), reason="requires declared Godot runtime")
