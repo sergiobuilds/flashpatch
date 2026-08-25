@@ -46,6 +46,11 @@ jobs:
           mv .tools/godot-4.7.1/Godot_v4.7.1-stable_linux.x86_64 .tools/godot
           chmod +x .tools/godot
           echo "32f8d7596c4b41185512b1c49d69f2da3be018fd784a53e349fa92a98a97bcde  .tools/godot" | sha256sum --check --status
+      - name: Install pinned FFmpeg runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg=7:6.1.1-3ubuntu5
+          ffmpeg -version | head -n 1 | grep --fixed-strings "ffmpeg version 6.1.1-3ubuntu5 "
       - run: GODOT_BINARY="$PWD/.tools/godot" python -m pytest -q -rs
 
   renderer-demo:
