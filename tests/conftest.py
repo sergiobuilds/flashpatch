@@ -76,7 +76,6 @@ PRIVATE_INPUT_BOUND_TESTS = {
     "tests/test_l7_durable_orchestrator.py::test_assembly_phase_closes_before_finalizing_the_run",
     "tests/test_l7_durable_orchestrator.py::test_canonical_publication_rejects_a_nonfinal_run",
     "tests/test_l7_durable_orchestrator.py::test_resume_rederives_contract_before_removing_an_incomplete_case",
-    "tests/test_release_supply_chain.py::test_release_bundle_is_licensed_reproducible_and_hash_verified",
     "tests/test_submission_package.py::test_submission_package_fixed_readback",
 }
 

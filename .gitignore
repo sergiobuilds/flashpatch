@@ -28,3 +28,4 @@ scripts/
 !/scripts/
 /scripts/*
 !/scripts/check_public_release.py
+!/scripts/build_release.py

@@ -1,6 +1,5 @@
 """Fail-closed intake for externally captured renderer frames.
-
-The intake validates only the supplied ``frame_npz_v1`` artifact. It deliberately
+The intake validates only the supplied ``frame_npz_v1`` artifact.  It deliberately
 does not infer an engine, source revision, replay trace, display behaviour, or a
 repair result from those pixels.
 """
@@ -14,7 +13,6 @@ from typing import Any
 
 from .core import analyze
 from .renderer_artifact import (
-    RendererArtifactError,
     open_renderer_artifact,
     renderer_rgb_sha256,
 )
@@ -43,7 +41,11 @@ def _window_payload(window: Any) -> dict[str, float | str]:
 
 
 def inspect_renderer_capture(path: Path) -> dict[str, object]:
-    """Return a factual detector receipt for one strict ``frame_npz_v1`` capture."""
+    """Return a factual detector receipt for one strict ``frame_npz_v1`` capture.
+
+    ``RendererArtifactError`` is intentionally left to the CLI boundary: malformed
+    evidence produces INCONCLUSIVE there and no receipt is published.
+    """
     source = path.resolve()
     with open_renderer_artifact(source) as artifact:
         analysis = analyze(artifact.frames, artifact.timestamps)

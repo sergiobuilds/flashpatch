@@ -6,7 +6,7 @@ from pathlib import Path
 
 from .corpus import GodotCorpus
 from .counterfactual import CounterfactualReplay
-from .explorer import ExplorationResult, RiskSeekingExplorer
+from .explorer import RiskSeekingExplorer
 from .godot import GodotReplayRunner
 from .patching import SourcePatchSynthesizer
 from .provenance import RenderProvenanceCollector

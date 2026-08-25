@@ -7,7 +7,6 @@ import subprocess
 
 from flashpatch.l7_external_host import (
     freeze_external_host_witness_request,
-    verify_external_host_witness,
     capture_host_identity,
     REQUIRED_TOOLS,
 )

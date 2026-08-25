@@ -7,9 +7,9 @@ from pathlib import Path
 
 
 EXPECTED_PROJECT_ROOT = "."
-EXPECTED_MASTER_MAP_VERSION = "2026-08-11_v160"
+EXPECTED_MASTER_MAP_VERSION = "2026-08-25_v163"
 EXPECTED_PLAN_PATH = "docs/plans/2026-08-02-l7-direct-detector-league.md"
-EXPECTED_PLAN_COMMIT = "b930148f088899f3fbf6bc87b1ebbd393ad3c071"
+EXPECTED_PLAN_COMMIT = "5f1f7123ec2a7fd2243a5efb89edd003b7d9c982"
 EXPECTED_SEED_PATH = "specs/L7-direct-detector-league-execution.seed.yaml"
 EXPECTED_WRITEBACK = (
     "own_leaf_status",
@@ -215,7 +215,7 @@ def _assert_plan_contract(plan_text: str) -> None:
     if frontmatter != {
         "doc_kind": "project-material",
         "status": "working",
-        "version": "2026-08-11_v81",
+        "version": "2026-08-25_v84",
         "canonical_path": "self",
     }:
         _fail("binding plan frontmatter changed")

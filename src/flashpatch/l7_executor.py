@@ -13,9 +13,7 @@ from .competition import verify_native_main_candidate_start_gate
 from .external_league import DIRECT_DETECTOR_POPULATION
 from .l7_external_host import (
     REQUEST_SCHEMA_V2,
-    VERIFICATION_SCHEMA_V2,
     RECEIPT_SCHEMA_V2,
-    MANIFEST_SCHEMA,
     PROBE_SCHEMA_V2,
     ExternalHostWitnessError,
     canonical_sha256,

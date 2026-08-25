@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "flashpatch"
 version = "0.1.0"
-description = "Fail-closed visual QA for Godot game projects."
+description = "Fail-closed visual QA for game development."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
@@ -20,11 +20,11 @@ flashpatch = "flashpatch.cli:main"
 [tool.setuptools]
 license-files = ["LICENSE", "NOTICE"]
 
+[tool.setuptools.package-data]
+flashpatch = ["_unity_packages_lock_2022_3_8f1.json"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.setuptools.package-data]
-flashpatch = ["_demo/interaction-burst/*"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

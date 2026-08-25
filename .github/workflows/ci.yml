@@ -10,26 +10,43 @@ permissions:
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.11", "3.12"]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: python -m pip install -e ".[dev]"
-      - run: pytest -q tests/test_standards.py tests/test_localization.py tests/test_repair.py tests/test_product_surface.py::test_installed_cli_and_ci_contract_are_executable
+      - run: python -m pip install pip==26.2.1 setuptools==84.0.0
+      - run: python -m pip install --no-build-isolation --requirement .github/requirements-ci.txt
+      - run: python -m pytest -q tests/test_standards.py tests/test_localization.py tests/test_repair.py tests/test_product_surface.py::test_installed_cli_and_ci_contract_are_executable
 
-  renderer-demo:
+  portable-full:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python -m pip install -e ".[dev]"
+      - run: python -m pip install pip==26.2.1 setuptools==84.0.0
+      - run: python -m pip install --no-build-isolation --requirement .github/requirements-ci.txt
+      - run: python -m pytest -q -rs
+
+  renderer-demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pip==26.2.1 setuptools==84.0.0
+      - run: python -m pip install --no-build-isolation --requirement .github/requirements-ci.txt
       - name: Install pinned Godot runtime
         shell: bash
         run: |

@@ -7,9 +7,9 @@ from pathlib import Path
 
 
 EXPECTED_PROJECT_ROOT = "."
-EXPECTED_MASTER_MAP_VERSION = "2026-08-10_v144"
+EXPECTED_MASTER_MAP_VERSION = "2026-08-25_v163"
 EXPECTED_PLAN_PATH = "docs/plans/2026-08-02-l6-sparta-controlled-chain.md"
-EXPECTED_PLAN_COMMIT = "5cc89c9d33d21f0653639794372f013ad7cc063b"
+EXPECTED_PLAN_COMMIT = "bf36a6250bb42258da299c31eb0c8d0bf562eb5f"
 EXPECTED_SEED_PATH = "specs/L6-sparta-controlled-chain-execution.seed.yaml"
 EXPECTED_WRITEBACK = (
     "own_leaf_status",

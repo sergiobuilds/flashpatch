@@ -38,9 +38,7 @@ from .core import analyze
 from .l7_external_host import (
     VERIFICATION_SCHEMA_V2 as EXTERNAL_HOST_VERIFICATION_SCHEMA_V2,
     capture_host_identity as capture_external_host_identity,
-    freeze_external_host_witness_request,
     verify_external_host_witness,
-    write_external_host_witness_request,
 )
 
 
@@ -9685,7 +9683,6 @@ def _reopen_child_normalized_observation(
     comparator: str,
     input_sha256: str,
 ) -> dict[str, object]:
-    root = child_path.parent
     schema_by_comparator = {
         "FlashPatch": "flashpatch-l7-direct-detector-run-v1",
         KAYA_DIRECT_PARTICIPANT_ID: KAYA_FAIR_RUNTIME_RUN_SCHEMA,

@@ -22,7 +22,7 @@ import threading
 from dataclasses import dataclass
 from dataclasses import replace
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable
 
 import numpy as np
 

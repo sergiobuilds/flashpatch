@@ -11,11 +11,11 @@ from .product import repair_video, scan_video, verify_video
 
 PAGE = b"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>FlashPatch visual QA demo</title><style>
+<title>FlashPatch judge demo</title><style>
 body{font:16px system-ui;max-width:760px;margin:3rem auto;padding:0 1rem}button{padding:.7rem 1rem}
 pre{white-space:pre-wrap;background:#f4f4f4;padding:1rem}video{max-width:100%}
 </style></head><body><h1>FlashPatch</h1>
-<p>Temporal visual-risk scan, minimal local repair, and separate decoder verification.</p>
+<p>WCAG 2.2 video hazard scan, minimal local repair, and independent verification.</p>
 <label>Upload video <input id="video" type="file" accept="video/mp4"></label>
 <button id="run">Scan, repair, verify</button><pre id="result">Ready.</pre>
 <a id="download" hidden>Download repaired video</a>

@@ -482,7 +482,9 @@ def test_safe_regular_pattern_bounds_luminance_strips_and_zero_mask(
     monkeypatch.setattr(core, "relative_luminance", recording_luminance)
     mask, windows, fraction = _regular_pattern_localization(frames, timestamps)
 
-    assert len(observed_shapes) == 3 * (3 + 3)
+    # Three row strips for stripes, three column strips for stripes, and
+    # three row strips for the orthogonal-lattice edge preflight per frame.
+    assert len(observed_shapes) == 3 * (3 + 3 + 3)
     assert all(
         shape[0] == 1
         and (
@@ -551,11 +553,21 @@ def test_regular_pattern_prefilter_preserves_alternating_stripe_candidates(
     actual = _regular_pattern_localization(frames, timestamps)
     expected = _whole_frame_regular_pattern_reference(frames, timestamps)
 
-    # Hazardous frames are intentionally revisited to materialize the public
-    # mask, so each qualifying row is evaluated once in each pass.
-    assert calls == 2 * len(frames) * frames.shape[1]
+    # Equal edge positions with globally reversed phase share one exact span
+    # per frame, and packed masks avoid a second materialization pass.
+    assert calls == len(frames)
     np.testing.assert_array_equal(actual[0], expected[0])
     assert actual[1:] == expected[1:]
+
+
+def test_lattice_sequence_search_has_a_fixed_candidate_bound() -> None:
+    import flashpatch.core as core
+
+    centers = list(range(3, 4096, 3))
+
+    sequences = core._regular_edge_sequences(centers, minimum=3)
+
+    assert len(sequences) <= core._LATTICE_SEQUENCE_LIMIT
 
 
 def make_clip() -> tuple[np.ndarray, np.ndarray, np.ndarray]:

@@ -494,7 +494,6 @@ def _validate_request(payload: object) -> dict[str, object]:
     if not isinstance(payload, Mapping):
         raise ExternalHostWitnessError("external host request fields are invalid")
     schema = payload.get("schema")
-    required = required_v2 if schema == REQUEST_SCHEMA_V2 else required_v1
     allowed = (
         {frozenset(required_v2), frozenset(required_v2 | {"execution_boundary"})}
         if schema == REQUEST_SCHEMA_V2

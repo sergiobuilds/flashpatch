@@ -854,7 +854,7 @@ def _run_decoder_parity_triplet(
     monkeypatch: pytest.MonkeyPatch,
 ) -> tuple[list[Path], Path, Path]:
     _require_bubblewrap_namespaces()
-    lane = materialize_cfr_ffv1(
+    materialize_cfr_ffv1(
         _frames(tmp_path / "frames.npz"),
         tmp_path / "lane",
         fps=60,
@@ -1465,7 +1465,7 @@ def test_comparator_receipt_binds_pinned_binary_input_and_raw_output(tmp_path: P
 
 
 def test_comparator_can_bind_stdout_as_its_declared_raw_output(tmp_path: Path) -> None:
-    lane = materialize_cfr_ffv1(_frames(tmp_path / "frames.npz"), tmp_path / "lane", fps=60)
+    materialize_cfr_ffv1(_frames(tmp_path / "frames.npz"), tmp_path / "lane", fps=60)
     spec = ComparatorSpec(
         name="stdout-detector", repository_url="https://example.invalid/stdout-detector", revision="b" * 40,
         license="MIT", mode="detection", raw_output_mode="stdout",
@@ -1479,7 +1479,7 @@ def test_comparator_can_bind_stdout_as_its_declared_raw_output(tmp_path: Path) -
 
 
 def test_comparator_can_declare_hazard_exit_code_as_valid_execution(tmp_path: Path) -> None:
-    lane = materialize_cfr_ffv1(_frames(tmp_path / "frames.npz"), tmp_path / "lane", fps=60)
+    materialize_cfr_ffv1(_frames(tmp_path / "frames.npz"), tmp_path / "lane", fps=60)
     spec = ComparatorSpec(
         name="hazard-exit-detector", repository_url="https://example.invalid/hazard-exit", revision="c" * 40,
         license="MIT", mode="detection", raw_output_mode="stdout", expected_exit_codes=(0, 1),
@@ -1501,7 +1501,7 @@ def test_comparator_rejects_video_not_owned_by_conversion_receipt(tmp_path: Path
 
 
 def test_tooflashy_parser_requires_receipt_bound_case_level_output(tmp_path: Path) -> None:
-    lane = materialize_cfr_ffv1(_frames(tmp_path / "frames.npz"), tmp_path / "lane", fps=60)
+    materialize_cfr_ffv1(_frames(tmp_path / "frames.npz"), tmp_path / "lane", fps=60)
     raw = tmp_path / "tooflashy.json"
     raw.write_text(json.dumps({"path": str(tmp_path / "lane" / "canonical.ffv1.mkv"), "passes": False, "fps": 60.0, "frame_count": 8, "event_count": 7, "failures": ["flash"]}))
     parsed = parse_tooflashy_json(raw, tmp_path / "lane" / "canonical.ffv1.mkv", expected_fps=60, expected_frame_count=8)
@@ -1738,7 +1738,7 @@ def test_iris_release_runner_binds_release_asset_input_and_csv(tmp_path: Path) -
 
 
 def test_repeated_iris_release_requires_same_frame_report_and_observation(tmp_path: Path) -> None:
-    lane = materialize_cfr_ffv1(_frames(tmp_path / "frames.npz"), tmp_path / "lane", fps=60)
+    materialize_cfr_ffv1(_frames(tmp_path / "frames.npz"), tmp_path / "lane", fps=60)
     release_asset = tmp_path / "iris-release.tar.gz"
     release_asset.write_bytes(b"official-release-asset")
     appsettings = tmp_path / "appsettings.json"

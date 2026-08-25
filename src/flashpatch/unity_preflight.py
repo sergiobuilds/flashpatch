@@ -62,4 +62,10 @@ def verify_unity_source_preflight(manifest_path: Path, project: Path) -> dict[st
         if actual != expected:
             raise UnityPreflightError("Unity preflight file hash does not match")
         observed[relative] = actual
-    return {"schema": "flashpatch-unity-source-preflight-receipt-v1", "engine": "Unity", "project_version": manifest["project_version"], "files": observed, "scope": "Pinned source files only; no Unity import, build, renderer capture, replay, or engine-support result was observed."}
+    return {
+        "schema": "flashpatch-unity-source-preflight-receipt-v1",
+        "engine": "Unity",
+        "project_version": manifest["project_version"],
+        "files": observed,
+        "scope": "Pinned source files only; no Unity import, build, renderer capture, replay, or engine-support result was observed.",
+    }

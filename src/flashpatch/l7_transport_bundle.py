@@ -21,7 +21,6 @@ from .l7_external_host import (
     RECEIPT_SCHEMA_V2,
     MANIFEST_SCHEMA,
     PROBE_SCHEMA_V2,
-    ROOT_FIELDS,
     canonical_sha256,
     capture_host_identity,
     _file_sha256,

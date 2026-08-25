@@ -921,13 +921,18 @@ def aggregate_artifact_league(
         pairwise, float(disagreement_rule["pairwise_position_win_rate"])
     )
     warnings.extend(orientation_warnings)
-    unique_winner = (
+    provisional_leader = (
         aggregate_candidates[0]["blind_id"]
         if len(aggregate_candidates) == 1
         or aggregate_candidates[0]["corrected_total_median"]
         > aggregate_candidates[1]["corrected_total_median"]
         else None
     )
+    decision_blockers = sorted({warning["code"] for warning in warnings})
+    decision_status = (
+        "VALID_FINAL_DECISION" if not decision_blockers else "INVALID_FOR_FINAL_DECISION"
+    )
+    unique_winner = provisional_leader if decision_status == "VALID_FINAL_DECISION" else None
     normalized_results = {
         "results": [results[item["assignment_id"]] for item in manifest["assignments"]],
         "pairwise_results": sorted(pairwise, key=lambda item: item["pair_id"]),
@@ -944,6 +949,9 @@ def aggregate_artifact_league(
             "evidence_cutoff": aggregate_policy["evidence_cutoff"],
         "lane_anchor_corrections": corrections,
         "candidates": aggregate_candidates,
+        "decision_status": decision_status,
+        "decision_blockers": decision_blockers,
+        "provisional_leader_blind_id": provisional_leader,
         "winner_blind_id": unique_winner,
         "warnings": warnings,
         "orientation": orientation,
@@ -1003,12 +1011,35 @@ def reveal_artifact_league(
             raise L8LeagueError("aggregate contains unknown blind identity")
         revealed_candidates.append({**candidate, "identity": identities[blind_id]})
     winner_blind_id = aggregate.get("winner_blind_id")
+    provisional_leader_blind_id = aggregate.get("provisional_leader_blind_id")
+    if provisional_leader_blind_id is not None and provisional_leader_blind_id not in identities:
+        raise L8LeagueError("aggregate contains unknown provisional leader identity")
+    decision_status = aggregate.get("decision_status")
+    decision_blockers = aggregate.get("decision_blockers")
+    if decision_status not in {"VALID_FINAL_DECISION", "INVALID_FOR_FINAL_DECISION"}:
+        raise L8LeagueError("aggregate decision status is invalid")
+    if not isinstance(decision_blockers, list) or any(
+        not isinstance(item, str) or not item for item in decision_blockers
+    ):
+        raise L8LeagueError("aggregate decision blockers are invalid")
+    if decision_status == "INVALID_FOR_FINAL_DECISION" and winner_blind_id is not None:
+        raise L8LeagueError("invalid final decision cannot declare a winner")
     revealed = {
         "schema": REVEAL_SCHEMA,
         "state": "REVEALED_AFTER_SEAL",
         "aggregate_sha256": _file_hash(aggregate_path),
         "population_commitment_sha256": aggregate["population_commitment_sha256"],
         "evidence_cutoff": aggregate["evidence_cutoff"],
+        "decision_status": decision_status,
+        "decision_blockers": decision_blockers,
+        "provisional_leader": (
+            None
+            if provisional_leader_blind_id is None
+            else {
+                "blind_id": provisional_leader_blind_id,
+                "identity": identities[provisional_leader_blind_id],
+            }
+        ),
         "winner": (
             None
             if winner_blind_id is None

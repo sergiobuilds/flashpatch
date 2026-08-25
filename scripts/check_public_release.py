@@ -14,14 +14,28 @@ from pathlib import Path
 FORBIDDEN_PREFIXES = (
     ".closure/",
     ".closure-artifacts/",
+    ".hermes/",
     ".ouroboros/",
     "artifacts/",
+    "benchmarks/aigame-psebench/baseline-league.json",
+    "benchmarks/aigame-psebench/results.json",
+    "benchmarks/aigame-psebench/source-patches/",
+    "docs/plans/",
+    "docs/research/day1-validation.json",
     "evidence/",
     "keys/",
+    "private/",
     "release/",
 )
+FORBIDDEN_PATHS = {
+    ".looprun-active",
+    "PASSDOWN.md",
+    "docs/CHRONICLE.md",
+    "docs/MASTER-MAP.md",
+}
+FORBIDDEN_SUFFIXES = (".seed.yaml",)
 ABSOLUTE_USER_PATH = re.compile(
-    r"(?<![\w.])/(?:home|Users)/[^/\s\"'`:,;)\]}=*?|<>]+/"
+    r"(?<![\w.])/(?:home|Users)/[^/\s\"'`:,;)\]}=*?|<>]+(?:/|(?=[\s\"'`:,;)\]}=*?|<>]))"
     r"|(?i:[A-Z]:\\Users\\[^\\\s\"'`:,;)\]}=*?|<>]+\\)"
 )
 PRIVATE_KEY_MATERIAL = re.compile(
@@ -30,6 +44,19 @@ PRIVATE_KEY_MATERIAL = re.compile(
 SECRET_TOKEN = re.compile(
     r"(?<![A-Za-z0-9])(?:ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})"
 )
+
+# Unreal's official Linux container image uses this service-account home. It is
+# a public runtime path, not a developer checkout or a personal identifier.
+PUBLIC_RUNTIME_HOMES = {"/home/ue4/", "/home/unity", "/home/unity/"}
+
+
+def _contains_private_absolute_path(content: str) -> bool:
+    return any(
+        match.group(0) not in PUBLIC_RUNTIME_HOMES
+        for match in ABSOLUTE_USER_PATH.finditer(content)
+    )
+
+
 def _tracked_files(root: Path) -> list[str]:
     completed = subprocess.run(
         ["git", "-C", str(root), "ls-files", "-z"],
@@ -53,7 +80,11 @@ def _text(path: Path) -> str | None:
 def audit(root: Path) -> list[str]:
     violations: list[str] = []
     for relative in _tracked_files(root):
-        if relative.startswith(FORBIDDEN_PREFIXES):
+        if (
+            relative in FORBIDDEN_PATHS
+            or relative.startswith(FORBIDDEN_PREFIXES)
+            or relative.endswith(FORBIDDEN_SUFFIXES)
+        ):
             violations.append(f"forbidden tracked path: {relative}")
         path = root / relative
         if not path.is_file():
@@ -62,7 +93,7 @@ def audit(root: Path) -> list[str]:
         content = _text(path)
         if content is None:
             continue
-        if ABSOLUTE_USER_PATH.search(content):
+        if _contains_private_absolute_path(content):
             violations.append(f"absolute user path: {relative}")
         if PRIVATE_KEY_MATERIAL.search(content):
             violations.append(f"private key material: {relative}")

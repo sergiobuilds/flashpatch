@@ -32,20 +32,24 @@ def test_l7_product_fixtures_are_byte_bound_and_have_fail_closed_provenance() ->
         assert len(case["fresh_l7"]["contract_sha256"]) == 64
 
 
-def test_gchess_disagreement_is_static_small_area_pattern_under_current_detector() -> None:
+def test_gchess_static_checker_lattice_is_detected_without_inventing_temporal_evidence() -> None:
     data = np.load(FIXTURE_ROOT / "gchess-blind-23583b652b8c31faa39089555f8fee97.npz")
     frames = data["frames"]
     adjacent_changes = np.any(frames[1:] != frames[:-1], axis=-1)
     result = analyze(data["frames"], data["timestamps"])
 
-    # The oracle's 0.00--0.55s regular-pattern label cannot supply temporal
-    # evidence for this byte-bound capture: every frame is identical.
+    # The case-level checker lattice is hazardous.  The oracle's truncated
+    # 0.00--0.55s interval still cannot be derived from this byte-bound
+    # capture because every frame is identical.
     assert np.array_equal(frames, np.broadcast_to(frames[0], frames.shape))
     assert not np.any(adjacent_changes)
-    assert result.hazardous is False
-    assert result.windows == ()
+    assert result.hazardous is True
+    assert len(result.windows) == 1
+    assert result.windows[0].kind == "regular_pattern"
+    assert result.windows[0].start == 0.0
+    assert result.windows[0].end == data["timestamps"][-1]
     assert result.max_flash_count == 0.0
-    assert 0.079 < result.max_affected_fraction < 0.081
+    assert result.max_affected_fraction > 0.40
 
 
 def test_super_mario_smooth_regular_pattern_flow_remains_safe() -> None:

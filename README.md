@@ -20,10 +20,10 @@ cd flashpatch-public
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install .
-flashpatch demo
+flashpatch safety-demo
 ```
 
-`safety-demo`는 source-bound Godot replay 예제입니다. Godot 4.x 실행 파일이 필요하며 `GODOT_BINARY`로 경로를 지정할 수 있습니다.
+`safety-demo`는 설치된 패키지만으로 `PASS`, `SAFE`, `FAIL`, `INCONCLUSIVE` 네 결론을 생성합니다. 이 deterministic contract fixture는 제품 흐름을 설명하는 데모이며 renderer evidence는 아닙니다.
 
 판정 기준은 임의로 정하지 않았습니다. WCAG 2.2의 일반 번쩍임 임계값과 ITU-R BT.1702 권고를 원문 출처와 함께 [`docs/research/`](docs/research/)에 고정해 두었고, 각 주장의 상태는 [`claims.json`](docs/research/claims.json)에서 확인하실 수 있습니다.
 
@@ -45,30 +45,24 @@ cd flashpatch-public
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install .
-flashpatch demo
+flashpatch safety-demo --json --output artifacts/safety-demo
 ```
 
-`demo` runs a deterministic hazardous clip through detection and repair, then prints a receipt: the SHA-256 of every input and output artifact, the detected flash count and area fraction, the thresholds used, and an independent re-check of the repaired output.
+`safety-demo` runs one deterministic contract fixture through localization, an allowlisted one-parameter patch, and same-trace revalidation. It writes a report and one hash-bound receipt for each terminal state.
 
 ```json
 {
-  "detected_area_fraction": 0.5,
-  "detected_max_flash_count": 5.5,
-  "input_hazardous": true,
-  "independent_repaired_passed": true,
-  "profile": "wcag22-general-flash-bootstrap",
-  "status": "VERIFIED"
+  "results": {
+    "fail": "FAIL",
+    "inconclusive": "INCONCLUSIVE",
+    "pass": "PASS",
+    "safe": "SAFE"
+  },
+  "schema": "flashpatch-safety-demo-v2"
 }
 ```
 
-With Godot 4.x installed, the source-bound demo exercises three non-failure terminal paths:
-
-```bash
-export GODOT_BINARY=/path/to/Godot
-flashpatch safety-demo --output artifacts/safety-demo
-```
-
-The summary reports `{"pass": "PASS", "safe": "SAFE", "inconclusive": "INCONCLUSIVE"}`.
+The source-bound Godot path is separate from this installed demonstration and uses the replay contract below.
 
 ## 4 What a verdict means
 
@@ -157,7 +151,7 @@ python scripts/check_public_release.py
 
 A clean anonymous clone completes the public test suite without failures. Tests bound to non-public evaluation inputs, runner scripts, release bundles, or the project map are explicitly skipped by [`tests/conftest.py`](tests/conftest.py). Missing public files are not part of that allowlist and remain failures.
 
-CI runs the portable regression subset on Python 3.11 and 3.12 across Linux, Windows, and macOS. That subset invokes the public-release checker for the SBOM and tracked source boundary. The Godot job downloads version 4.7.1, verifies its SHA-256, and runs the source-bound replay demo. The full public suite additionally builds the wheel and runs its packaged demo fixture outside the checkout.
+CI runs the portable regression subset on Python 3.11 and 3.12 across Linux, Windows, and macOS. That subset invokes the public-release checker for the SBOM and tracked source boundary. A second job runs the complete public suite. The package tests build a wheel, install it outside the checkout, and run the four-state demo from the installed package.
 
 ## 10 License and SBOM
 
@@ -165,4 +159,5 @@ CI runs the portable regression subset on Python 3.11 and 3.12 across Linux, Win
 
 ## 11 Change history
 
+- 2026-08-25: synchronized the source package with the final candidate, added the four-state installed demo, and hardened the public boundary against private paths and a missing SBOM.
 - 2026-08-24: documented anonymous non-editable installation, separated the engine-free and Godot-backed demos, and added public-boundary and SBOM verification.

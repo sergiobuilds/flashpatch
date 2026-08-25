@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-from importlib import resources
 import json
 from pathlib import Path
-import shutil
 
 import numpy as np
 
@@ -235,49 +233,6 @@ def _repair_file(source: Path, destination: Path, receipt_path: Path) -> dict[st
     return receipt
 
 
-def _run_safety_demo(output: Path) -> dict[str, object]:
-    candidates = [Path.cwd(), Path(__file__).resolve().parents[2]]
-    smoke: Path | None = next(
-        (
-            root / "benchmarks" / "aigame-psebench" / "corpus" / "interaction-burst"
-            for root in candidates
-            if (root / "benchmarks" / "aigame-psebench" / "corpus" / "interaction-burst" / "flashpatch.contract.json").is_file()
-        ),
-        None,
-    )
-    if smoke is None:
-        packaged = resources.files("flashpatch").joinpath("_demo", "interaction-burst")
-        if packaged.joinpath("flashpatch.contract.json").is_file():
-            smoke = Path(str(packaged))
-    if smoke is None:
-        raise RuntimeError("safety demo fixture is missing from the installed package")
-    contract = smoke / "flashpatch.contract.json"
-    output.mkdir(parents=True, exist_ok=True)
-    passed = compile_project(smoke, contract, workspace=output / "pass-work")
-    write_receipt(passed, output / "pass-receipt.json")
-
-    safe_project = output / "safe-project"
-    shutil.copytree(smoke, safe_project, dirs_exist_ok=True)
-    safe_trace = safe_project / "safe-trace.json"
-    safe_trace.write_text(
-        json.dumps({"fixed_fps": 60, "actions": [{"frame": 0, "charge": True}, {"frame": 1}]}),
-        encoding="utf-8",
-    )
-    safe_contract = json.loads(contract.read_text(encoding="utf-8"))
-    safe_contract["trace"] = "safe-trace.json"
-    (safe_project / "flashpatch.json").write_text(json.dumps(safe_contract), encoding="utf-8")
-    safe = compile_project(safe_project, safe_trace, workspace=output / "safe-work")
-    write_receipt(safe, output / "safe-receipt.json")
-
-    missing = output / "missing-contract.json"
-    inconclusive = compile_project(smoke, missing, workspace=output / "inconclusive-work")
-    write_receipt(inconclusive, output / "inconclusive-receipt.json")
-    results = {"pass": passed["verdict"], "safe": safe["verdict"], "inconclusive": inconclusive["verdict"]}
-    if results != {"pass": "PASS", "safe": "SAFE", "inconclusive": "INCONCLUSIVE"}:
-        raise RuntimeError(f"safety demo terminal states are invalid: {results}")
-    return {"schema": "flashpatch-safety-demo-v1", "results": results, "output": str(output)}
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(prog="flashpatch")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -293,8 +248,12 @@ def main() -> None:
     )
     compile_command.add_argument("--workspace", type=Path, default=Path("artifacts/flashpatch-ci"))
     compile_command.add_argument("--receipt", type=Path, default=Path("artifacts/flashpatch-ci/receipt.json"))
-    safety_demo = subparsers.add_parser("safety-demo", help="run PASS, SAFE, and INCONCLUSIVE Safety CI examples")
+    safety_demo = subparsers.add_parser(
+        "safety-demo",
+        help="show input, hazard localization, one patch, revalidation, and all terminal receipts",
+    )
     safety_demo.add_argument("--output", type=Path, default=Path("artifacts/safety-demo"))
+    safety_demo.add_argument("--json", action="store_true", dest="json_output")
     demo = subparsers.add_parser("demo", help="run the deterministic proof clip")
     demo.add_argument("--output", type=Path, default=Path("artifacts/demo"))
     scan = subparsers.add_parser("scan", help="scan an MP4 file for flash hazards")
@@ -306,16 +265,41 @@ def main() -> None:
     )
     renderer_intake.add_argument("input", type=Path)
     renderer_intake.add_argument("--receipt", type=Path, required=True)
-    unity_preflight = subparsers.add_parser("unity-preflight", help="bind pinned Unity source files without importing or running the editor")
+    unity_preflight = subparsers.add_parser(
+        "unity-preflight",
+        help="bind pinned Unity source files without importing or running the editor",
+    )
     unity_preflight.add_argument("manifest", type=Path)
     unity_preflight.add_argument("project", type=Path)
+    l10_verify = subparsers.add_parser(
+        "l10-verify",
+        help="re-open a fail-closed L10 engine receipt or three-engine bundle",
+    )
+    l10_verify.add_argument("input", type=Path)
+    l10_verify.add_argument("--bundle", action="store_true")
+    l10_verify.add_argument("--trust-policy", type=Path, required=True)
+    l10_verify.add_argument("--expected-trust-policy-sha256", required=True)
+    l10_unity_run = subparsers.add_parser(
+        "l10-unity-run",
+        help="run the frozen eight-execution Unity L10 matrix on one idle GPU",
+    )
+    l10_unity_run.add_argument("--factual-template", type=Path, required=True)
+    l10_unity_run.add_argument("--counterfactual-template", type=Path, required=True)
+    l10_unity_run.add_argument("--factual-manifest", type=Path, required=True)
+    l10_unity_run.add_argument("--counterfactual-manifest", type=Path, required=True)
+    l10_unity_run.add_argument("--runtime-output", type=Path, required=True)
+    l10_unity_run.add_argument("--entitlement", type=Path, required=True)
+    l10_unity_run.add_argument("--vulkan-loader", type=Path, required=True)
+    l10_unity_run.add_argument("--gpu-index", type=int, required=True)
+    l10_unity_run.add_argument("--display", required=True)
+    l10_unity_run.add_argument("--timeout-seconds", type=int, default=1800)
     repair = subparsers.add_parser("repair", help="repair an MP4 file and write a receipt")
     repair.add_argument("input", type=Path)
     repair.add_argument("output", type=Path)
     repair.add_argument("--receipt", type=Path, required=True)
     verify = subparsers.add_parser("verify", help="verify an MP4 file")
     verify.add_argument("input", type=Path)
-    web = subparsers.add_parser("web", help="serve the browser visual QA demo")
+    web = subparsers.add_parser("web", help="serve the judge-visible browser demo")
     web.add_argument("--host", default="127.0.0.1")
     web.add_argument("--port", type=int, default=8080)
     web.add_argument("--workspace", type=Path, default=Path("artifacts/web"))
@@ -328,7 +312,14 @@ def main() -> None:
         if receipt["verdict"] not in {"PASS", "SAFE"}:
             raise SystemExit(2)
     elif args.command == "safety-demo":
-        print(json.dumps(_run_safety_demo(args.output), indent=2, sort_keys=True))
+        from .product_demo import format_safety_demo, run_safety_demo
+
+        report = run_safety_demo(args.output)
+        print(
+            json.dumps(report, indent=2, sort_keys=True)
+            if args.json_output
+            else format_safety_demo(report)
+        )
     elif args.command == "demo":
         receipt = _run_demo(args.output)
         print(json.dumps(receipt, indent=2, sort_keys=True))
@@ -348,6 +339,49 @@ def main() -> None:
         try:
             print(json.dumps(verify_unity_source_preflight(args.manifest, args.project), indent=2, sort_keys=True))
         except (OSError, UnityPreflightError) as exc:
+            print(json.dumps({"verdict": "INCONCLUSIVE", "reason": str(exc)}, sort_keys=True))
+            raise SystemExit(2) from exc
+    elif args.command == "l10-verify":
+        from .l10_receipt import L10ReceiptError, verify_l10_bundle, verify_l10_receipt
+
+        try:
+            result = (
+                verify_l10_bundle(
+                    args.input,
+                    args.trust_policy,
+                    args.expected_trust_policy_sha256,
+                )
+                if args.bundle
+                else verify_l10_receipt(
+                    args.input,
+                    args.trust_policy,
+                    args.expected_trust_policy_sha256,
+                )
+            )
+            print(json.dumps(result, indent=2, sort_keys=True))
+            if result.get("verified") is not True:
+                raise SystemExit(2)
+        except (OSError, L10ReceiptError) as exc:
+            print(json.dumps({"verified": False, "verdict": "INCONCLUSIVE", "reason": str(exc)}, sort_keys=True))
+            raise SystemExit(2) from exc
+    elif args.command == "l10-unity-run":
+        from .l10_unity_runner import UnityL10RunError, run_unity_l10_matrix
+
+        try:
+            result = run_unity_l10_matrix(
+                args.factual_template,
+                args.counterfactual_template,
+                args.factual_manifest,
+                args.counterfactual_manifest,
+                args.runtime_output,
+                args.entitlement,
+                args.vulkan_loader,
+                gpu_index=args.gpu_index,
+                display=args.display,
+                timeout_seconds=args.timeout_seconds,
+            )
+            print(json.dumps(result, indent=2, sort_keys=True))
+        except (OSError, UnityL10RunError) as exc:
             print(json.dumps({"verdict": "INCONCLUSIVE", "reason": str(exc)}, sort_keys=True))
             raise SystemExit(2) from exc
     elif args.command == "repair":

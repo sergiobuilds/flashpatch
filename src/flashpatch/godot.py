@@ -160,6 +160,7 @@ class GodotRendererReplayRunner(GodotReplayRunner):
         result = json.loads(output.read_text(encoding="utf-8"))
         if not isinstance(result, dict) or result.get("status") != "REPLAYED":
             raise RuntimeError(f"Godot renderer replay returned an invalid result: {result!r}")
+        result["engine_execution_log"] = completed.stdout
         capture = result.get("renderer_capture")
         if not isinstance(capture, dict):
             raise RuntimeError("Godot renderer replay omitted renderer_capture manifest")
@@ -172,6 +173,19 @@ class GodotRendererReplayRunner(GodotReplayRunner):
             raise RuntimeError("renderer_capture.frame_directory must be a non-empty string")
         if not isinstance(raw_timestamps, list) or not raw_timestamps:
             raise RuntimeError("renderer_capture.timestamps_us must be a non-empty list")
+        if (
+            any(
+                isinstance(value, bool) or not isinstance(value, int)
+                for value in raw_timestamps
+            )
+            or any(
+                right <= left
+                for left, right in zip(raw_timestamps, raw_timestamps[1:])
+            )
+        ):
+            raise RuntimeError(
+                "renderer_capture.timestamps_us must be a strictly increasing provenance timeline"
+            )
         if actual_timestamps is not None and (
             not isinstance(actual_timestamps, list)
             or len(actual_timestamps) != len(raw_timestamps)
@@ -179,6 +193,10 @@ class GodotRendererReplayRunner(GodotReplayRunner):
             or any(right <= left for left, right in zip(actual_timestamps, actual_timestamps[1:]))
         ):
             raise RuntimeError("renderer_capture.actual_capture_timestamps_us must be a strictly increasing provenance timeline")
+        if actual_timestamps is None:
+            actual_timestamps = list(raw_timestamps)
+        fixed_fps = self._fixed_fps(trace)
+        raw_timestamps = [round(index * 1_000_000 / fixed_fps) for index in range(len(raw_timestamps))]
         if (
             not isinstance(viewport, list)
             or len(viewport) != 2
@@ -222,6 +240,8 @@ class GodotRendererReplayRunner(GodotReplayRunner):
         result["frames_npz"] = artifact.name
         result["renderer_capture"] = {
             **capture,
+            "actual_capture_timestamps_us": actual_timestamps,
+            "timestamps_us": raw_timestamps,
             "frame_count": len(frame_array),
             "shape": list(frame_array.shape),
             "dtype": frame_array.dtype.str,

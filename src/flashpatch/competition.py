@@ -4031,7 +4031,10 @@ def main(argv: list[str] | None = None) -> int:
     resume.add_argument("--receipt", default="")
     args = parser.parse_args(argv)
     try:
-        if args.command == "preflight": output, code = preflight(args.plan, args.expected_commit, args.checkpoints), 0
+        if args.command == "preflight":
+            output, code = preflight(
+                args.plan, args.expected_commit, args.checkpoints
+            ), 0
         elif args.command == "resume":
             if checkpoint_is_reusable(
                 args.checkpoints, args.leaf, immutable_input=args.input, command=args.checkpoint_command,
@@ -4040,11 +4043,16 @@ def main(argv: list[str] | None = None) -> int:
                 output, code = f"REUSED checkpoint leaf={args.leaf}", 0
             else:
                 output, code = f"INCONCLUSIVE checkpoint leaf={args.leaf} not reusable", 1
-        elif args.command == "run-matrix": output, code = run_matrix(args.plan), 0
-        elif args.command == "validate-plan": output, code = validate_plan(args.plan), 0
-        elif args.command == "validate-case": output, code = validate_case(args.case), 0
-        elif args.command == "validate-provenance": output, code = validate_provenance(args.manifest), 0
-        elif args.command == "verify-receipt": output, code = verify_receipt(args.receipt), 0
+        elif args.command == "run-matrix":
+            output, code = run_matrix(args.plan), 0
+        elif args.command == "validate-plan":
+            output, code = validate_plan(args.plan), 0
+        elif args.command == "validate-case":
+            output, code = validate_case(args.case), 0
+        elif args.command == "validate-provenance":
+            output, code = validate_provenance(args.manifest), 0
+        elif args.command == "verify-receipt":
+            output, code = verify_receipt(args.receipt), 0
         elif args.command == "validate-independent-gold":
             output = validate_independent_gold(
                 args.receipt,
@@ -4101,9 +4109,12 @@ def main(argv: list[str] | None = None) -> int:
                 sort_keys=True,
                 indent=2,
             ), 0
-        elif args.command == "prepare-league": output, code = prepare_league(args.run), 0
-        elif args.command == "aggregate-league": output, code = aggregate_league(args.run, args.results), 0
-        elif args.command == "reveal-league": output, code = reveal_league(args.run, args.aggregate), 0
+        elif args.command == "prepare-league":
+            output, code = prepare_league(args.run), 0
+        elif args.command == "aggregate-league":
+            output, code = aggregate_league(args.run, args.results), 0
+        elif args.command == "reveal-league":
+            output, code = reveal_league(args.run, args.aggregate), 0
         elif args.command == "prepare-artifact-league":
             prepared = prepare_artifact_league(
                 candidates_path=args.candidates,
@@ -4133,9 +4144,12 @@ def main(argv: list[str] | None = None) -> int:
                 run=args.run, aggregate_path=args.aggregate, out=args.out
             )
             output, code = f"REVEALED after seal candidates={len(revealed['candidates'])}", 0
-        elif args.command == "verify-chain": output, code = verify_chain(args.case), 0
-        elif args.command == "compare-detectors": code, output = compare_detectors(args.manifest)
-        else: code, output = claim_gate(args.manifest)
+        elif args.command == "verify-chain":
+            output, code = verify_chain(args.case), 0
+        elif args.command == "compare-detectors":
+            code, output = compare_detectors(args.manifest)
+        else:
+            code, output = claim_gate(args.manifest)
     except (ContractError, L8LeagueError) as exc:
         print(str(exc), file=sys.stderr)
         return 1

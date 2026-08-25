@@ -11,6 +11,12 @@ from .standards import regular_pattern_is_hazardous
 
 _SPATIAL_TILE_EDGE = 128
 _REGULAR_PATTERN_WORKERS = 4
+_LATTICE_EDGE_SUPPORT = 0.25
+_LATTICE_MIN_BOUNDARIES = 6
+_LATTICE_SPACING_TOLERANCE = 0.15
+_LATTICE_PHASE_AGREEMENT = 0.90
+_LATTICE_SEQUENCE_LIMIT = 32
+_LATTICE_SAMPLE_ROW_CHUNK = 16
 _SRGB8_ENCODED = np.arange(256, dtype=np.float64) / 255.0
 _SRGB8_LINEAR = np.where(
     _SRGB8_ENCODED <= 0.04045,
@@ -496,7 +502,375 @@ def _alternating_stripe_eligible_signals(plane: np.ndarray, *, axis: int) -> np.
     return np.any(np.all(consecutive, axis=-1), axis=1)
 
 
-def _regular_pattern_candidate(frame: np.ndarray) -> np.ndarray:
+def _uniform_stripe_span(
+    plane: np.ndarray, *, axis: int, eligible: np.ndarray
+) -> tuple[int, int] | None:
+    """Reuse one span when every signal has the same edges and phase up to sign."""
+    if not len(eligible) or not np.all(eligible):
+        return None
+    differences = np.diff(plane, axis=axis)
+    if axis == 0:
+        differences = differences.T
+    active = np.abs(differences) >= 0.1
+    if not np.all(active == active[0]):
+        return None
+    directions = np.sign(differences)
+    reference = directions[0]
+    same_phase = np.all(directions == reference, axis=1)
+    opposite_phase = np.all(directions == -reference, axis=1)
+    if not np.all(same_phase | opposite_phase):
+        return None
+    return _alternating_stripe_span(plane[0] if axis == 1 else plane[:, 0])
+
+
+def _supported_edge_centers(support: np.ndarray) -> list[int]:
+    """Collapse contiguous, well-supported edge pixels to boundary centers."""
+    positions = np.flatnonzero(support >= _LATTICE_EDGE_SUPPORT)
+    if not len(positions):
+        return []
+    centers: list[int] = []
+    for group in np.split(positions, np.flatnonzero(np.diff(positions) > 1) + 1):
+        center = int(round(float(np.average(group, weights=support[group])))) + 1
+        centers.append(center)
+    return centers
+
+
+def _regular_edge_sequences(
+    centers: list[int], *, minimum: int
+) -> tuple[tuple[int, ...], ...]:
+    """Find a bounded set of equal-pitch edge runs in near-linear time."""
+    if len(centers) < minimum:
+        return ()
+    values = np.asarray(centers, dtype=np.int64)
+    pitch_differences = np.concatenate(
+        [
+            values[stride:] - values[:-stride]
+            for stride in range(1, min(8, len(values) - 1) + 1)
+        ]
+    )
+    possible = np.unique(pitch_differences[pitch_differences >= 3])
+    if not len(possible):
+        return ()
+    scored_pitches = sorted(
+        (
+            (
+                int(
+                    np.count_nonzero(
+                        np.abs(pitch_differences - pitch)
+                        <= max(2, pitch * _LATTICE_SPACING_TOLERANCE)
+                    )
+                ),
+                int(pitch),
+            )
+            for pitch in possible
+        ),
+        reverse=True,
+    )
+    pitches: list[int] = []
+    for _, pitch in scored_pitches:
+        if any(
+            abs(pitch - selected)
+            <= max(2, selected * _LATTICE_SPACING_TOLERANCE)
+            for selected in pitches
+        ):
+            continue
+        pitches.append(pitch)
+        if len(pitches) == 8:
+            break
+
+    def match(target: float, tolerance: float) -> int | None:
+        insertion = int(np.searchsorted(values, target))
+        options = [
+            index
+            for index in (insertion - 1, insertion)
+            if 0 <= index < len(values) and abs(values[index] - target) <= tolerance
+        ]
+        return min(options, key=lambda index: abs(values[index] - target)) if options else None
+
+    sequences: set[tuple[int, ...]] = set()
+    for pitch in pitches:
+        tolerance = max(2.0, pitch * _LATTICE_SPACING_TOLERANCE)
+        for root, center in enumerate(values):
+            predecessor = match(float(center - pitch), tolerance)
+            if predecessor is not None and predecessor < root:
+                continue
+            indices = [root]
+            while True:
+                following = match(float(values[indices[-1]] + pitch), tolerance)
+                if following is None or following <= indices[-1]:
+                    break
+                indices.append(following)
+            if len(indices) < minimum:
+                continue
+            sequence = tuple(int(values[index]) for index in indices)
+            sequences.add(sequence)
+            if len(sequence) > minimum:
+                for start in range(len(sequence) - minimum + 1):
+                    sequences.add(sequence[start : start + minimum])
+    ranked = sorted(
+        sequences,
+        key=lambda sequence: (sequence[-1] - sequence[0], len(sequence)),
+        reverse=True,
+    )
+    return tuple(ranked[:_LATTICE_SEQUENCE_LIMIT])
+
+
+def _boundary_variants(sequence: tuple[int, ...], limit: int) -> tuple[tuple[int, ...], ...]:
+    spacing = float(np.median(np.diff(sequence)))
+    prepend = max(0, int(round(sequence[0] - spacing)))
+    append = min(limit, int(round(sequence[-1] + spacing)))
+    variants = {sequence}
+    if sequence[0] - prepend >= 0.6 * spacing:
+        variants.add((prepend, *sequence))
+    if append - sequence[-1] >= 0.6 * spacing:
+        variants.add((*sequence, append))
+    if (
+        sequence[0] - prepend >= 0.6 * spacing
+        and append - sequence[-1] >= 0.6 * spacing
+    ):
+        variants.add((prepend, *sequence, append))
+    return tuple(sorted(variants))
+
+
+def _sample_cell_luminance(
+    frame: np.ndarray, y_edges: tuple[int, ...], x_edges: tuple[int, ...]
+) -> np.ndarray:
+    fractions = np.asarray((0.2, 0.4, 0.6, 0.8))
+    y_top = np.asarray(y_edges[:-1])[:, None]
+    y_bottom = np.asarray(y_edges[1:])[:, None]
+    x_left = np.asarray(x_edges[:-1])[:, None]
+    x_right = np.asarray(x_edges[1:])[:, None]
+    y = np.minimum(y_bottom - 1, y_top + ((y_bottom - y_top) * fractions).astype(int))
+    x = np.minimum(x_right - 1, x_left + ((x_right - x_left) * fractions).astype(int))
+    means = np.empty((len(y), len(x)), dtype=np.float64)
+    for start in range(0, len(y), _LATTICE_SAMPLE_ROW_CHUNK):
+        stop = min(start + _LATTICE_SAMPLE_ROW_CHUNK, len(y))
+        samples = frame[y[start:stop, :, None, None], x[None, None, :, :]]
+        linear = _SRGB8_LINEAR[samples]
+        luminance = (
+            0.2126 * linear[..., 0]
+            + 0.7152 * linear[..., 1]
+            + 0.0722 * linear[..., 2]
+        )
+        means[start:stop] = np.mean(luminance, axis=(1, 3))
+    return means
+
+
+def _lattice_block_is_coherent(means: np.ndarray) -> bool:
+    low, high = np.quantile(means, (0.25, 0.75))
+    if high - low < 0.1 or means.shape[0] < 3 or means.shape[1] < 3:
+        return False
+    horizontal_directions = np.sign(np.diff(means, axis=1))
+    vertical_directions = np.sign(np.diff(means, axis=0))
+    horizontal_reversals = (
+        horizontal_directions[:, 1:] == -horizontal_directions[:, :-1]
+    )
+    vertical_reversals = vertical_directions[1:] == -vertical_directions[:-1]
+    horizontal_contrast = np.abs(np.diff(means, axis=1)) >= 0.1
+    vertical_contrast = np.abs(np.diff(means, axis=0)) >= 0.1
+    return bool(
+        np.all(np.mean(horizontal_reversals, axis=0) >= _LATTICE_PHASE_AGREEMENT)
+        and np.all(np.mean(vertical_reversals, axis=1) >= _LATTICE_PHASE_AGREEMENT)
+        and np.all(np.mean(horizontal_contrast, axis=0) >= _LATTICE_PHASE_AGREEMENT)
+        and np.all(np.mean(vertical_contrast, axis=1) >= _LATTICE_PHASE_AGREEMENT)
+    )
+
+
+def _covered_expansion_is_coherent(
+    frame: np.ndarray,
+    x_sequence: tuple[int, ...],
+    y_sequence: tuple[int, ...],
+    x_edges: tuple[int, ...],
+    y_edges: tuple[int, ...],
+    cache: dict[tuple[tuple[int, ...], tuple[int, ...]], bool],
+) -> bool:
+    bands: list[tuple[tuple[int, ...], tuple[int, ...]]] = []
+    if x_edges[0] != x_sequence[0]:
+        bands.append((y_edges, x_edges[:4]))
+    if x_edges[-1] != x_sequence[-1]:
+        bands.append((y_edges, x_edges[-4:]))
+    if y_edges[0] != y_sequence[0]:
+        bands.append((y_edges[:4], x_edges))
+    if y_edges[-1] != y_sequence[-1]:
+        bands.append((y_edges[-4:], x_edges))
+    if not bands:
+        return False
+    for band_y, band_x in bands:
+        key = (band_y, band_x)
+        coherent = cache.get(key)
+        if coherent is None:
+            coherent = _lattice_block_is_coherent(
+                _sample_cell_luminance(frame, band_y, band_x)
+            )
+            cache[key] = coherent
+        if not coherent:
+            return False
+    return True
+
+
+def _coherent_lattice_mask(
+    frame: np.ndarray,
+    x_sequences: tuple[tuple[int, ...], ...],
+    y_sequences: tuple[tuple[int, ...], ...],
+    *,
+    expand_outer: bool,
+    tracking_margin: bool = False,
+    covered: np.ndarray | None = None,
+) -> np.ndarray:
+    height, width = frame.shape[:2]
+    candidates: list[
+        tuple[
+            int,
+            tuple[int, ...],
+            tuple[int, ...],
+            tuple[int, ...],
+            tuple[int, ...],
+            bool,
+        ]
+    ] = []
+    for x_sequence in x_sequences:
+        for y_sequence in y_sequences:
+            base_covered = False
+            if covered is not None:
+                base_covered = np.all(
+                    covered[
+                        y_sequence[0] : y_sequence[-1],
+                        x_sequence[0] : x_sequence[-1],
+                    ]
+                )
+                if base_covered and not expand_outer:
+                    continue
+            x_variants = _boundary_variants(x_sequence, width) if expand_outer else (x_sequence,)
+            y_variants = _boundary_variants(y_sequence, height) if expand_outer else (y_sequence,)
+            for x_edges in x_variants:
+                for y_edges in y_variants:
+                    left, right = x_edges[0], x_edges[-1]
+                    top, bottom = y_edges[0], y_edges[-1]
+                    if tracking_margin:
+                        x_margin = int(round(float(np.median(np.diff(x_edges))) / 2.0))
+                        y_margin = int(round(float(np.median(np.diff(y_edges))) / 2.0))
+                        left, right = max(0, left - x_margin), min(width, right + x_margin)
+                        top, bottom = max(0, top - y_margin), min(height, bottom + y_margin)
+                    area = (right - left) * (bottom - top)
+                    candidates.append(
+                        (
+                            area,
+                            x_edges,
+                            y_edges,
+                            x_sequence,
+                            y_sequence,
+                            bool(base_covered),
+                        )
+                    )
+    candidates.sort(key=lambda item: (-item[0], item[1], item[2]))
+    result = (
+        np.zeros((height, width), dtype=bool)
+        if covered is None
+        else np.array(covered, dtype=bool, copy=True)
+    )
+    coherence_cache: dict[tuple[tuple[int, ...], tuple[int, ...]], bool] = {}
+    for _, x_edges, y_edges, x_sequence, y_sequence, base_covered in candidates:
+        left, right = x_edges[0], x_edges[-1]
+        top, bottom = y_edges[0], y_edges[-1]
+        if tracking_margin:
+            x_margin = int(round(float(np.median(np.diff(x_edges))) / 2.0))
+            y_margin = int(round(float(np.median(np.diff(y_edges))) / 2.0))
+            left, right = max(0, left - x_margin), min(width, right + x_margin)
+            top, bottom = max(0, top - y_margin), min(height, bottom + y_margin)
+        if np.all(result[top:bottom, left:right]):
+            continue
+        if base_covered:
+            coherent = _covered_expansion_is_coherent(
+                frame,
+                x_sequence,
+                y_sequence,
+                x_edges,
+                y_edges,
+                coherence_cache,
+            )
+        else:
+            key = (y_edges, x_edges)
+            coherent = coherence_cache.get(key)
+            if coherent is None:
+                coherent = _lattice_block_is_coherent(
+                    _sample_cell_luminance(frame, y_edges, x_edges)
+                )
+                coherence_cache[key] = coherent
+        if not coherent:
+            continue
+        result[top:bottom, left:right] = True
+    return result
+
+
+@dataclass(frozen=True)
+class _LatticeCandidate:
+    mask: np.ndarray
+    tracking_mask: np.ndarray
+
+
+def _regular_lattice_candidate(
+    frame: np.ndarray, *, covered: np.ndarray | None = None
+) -> _LatticeCandidate:
+    """Localize a coherent two-dimensional alternating-cell lattice.
+
+    The stripe lane intentionally requires six one-dimensional light/dark
+    pairs.  A checker or tiled lattice distributes those alternations across
+    both axes, so no single row supplies eleven significant edges.  This lane
+    separately requires repeated, equal-pitch boundaries on both axes and a
+    high-agreement alternating phase across the enclosed cells.
+    """
+    height, width = frame.shape[:2]
+    vertical_counts = np.zeros(max(0, width - 1), dtype=np.int64)
+    horizontal_counts = np.zeros(max(0, height - 1), dtype=np.int64)
+    previous_row: np.ndarray | None = None
+    for row_slice in _strip_slices(height):
+        plane = relative_luminance(frame[None, row_slice, :, :])[0]
+        vertical_counts += np.count_nonzero(np.abs(np.diff(plane, axis=1)) >= 0.1, axis=0)
+        if previous_row is not None:
+            horizontal_counts[row_slice.start - 1] = np.count_nonzero(
+                np.abs(plane[0] - previous_row) >= 0.1
+            )
+        if len(plane) > 1:
+            horizontal_counts[row_slice.start : row_slice.stop - 1] = np.count_nonzero(
+                np.abs(np.diff(plane, axis=0)) >= 0.1, axis=1
+            )
+        previous_row = plane[-1]
+
+    x_centers = _supported_edge_centers(vertical_counts / max(1, height))
+    y_centers = _supported_edge_centers(horizontal_counts / max(1, width))
+    tracking_x = _regular_edge_sequences(x_centers, minimum=4)
+    tracking_y = _regular_edge_sequences(y_centers, minimum=4)
+    tracking = _coherent_lattice_mask(
+        frame,
+        tracking_x,
+        tracking_y,
+        expand_outer=False,
+        tracking_margin=True,
+        covered=covered,
+    )
+    eligible_x = _regular_edge_sequences(
+        x_centers, minimum=_LATTICE_MIN_BOUNDARIES
+    )
+    eligible_y = _regular_edge_sequences(
+        y_centers, minimum=_LATTICE_MIN_BOUNDARIES
+    )
+    eligible = _coherent_lattice_mask(
+        frame,
+        eligible_x,
+        eligible_y,
+        expand_outer=True,
+        covered=covered,
+    )
+    return _LatticeCandidate(mask=eligible, tracking_mask=tracking)
+
+
+@dataclass(frozen=True)
+class _RegularPatternCandidate:
+    mask: np.ndarray
+    tracking_mask: np.ndarray
+
+
+def _regular_pattern_candidate(frame: np.ndarray) -> _RegularPatternCandidate:
     """Find one frame's pattern pixels while bounding float luminance planes.
 
     A row is always inspected across the complete frame width, and a column is
@@ -510,27 +884,53 @@ def _regular_pattern_candidate(frame: np.ndarray) -> np.ndarray:
     for row_slice in _strip_slices(height):
         plane = relative_luminance(frame[None, row_slice, :, :])[0]
         row_eligible = _alternating_stripe_eligible_signals(plane, axis=1)
-        for row_index in np.flatnonzero(row_eligible):
-            row = plane[row_index]
-            span = _alternating_stripe_span(row)
-            if span is not None:
-                candidate[row_slice.start + row_index, span[0] : span[1]] = True
+        uniform_span = _uniform_stripe_span(plane, axis=1, eligible=row_eligible)
+        if uniform_span is not None:
+            candidate[
+                row_slice, uniform_span[0] : uniform_span[1]
+            ] = True
+        else:
+            for row_index in np.flatnonzero(row_eligible):
+                row = plane[row_index]
+                span = _alternating_stripe_span(row)
+                if span is not None:
+                    candidate[
+                        row_slice.start + row_index, span[0] : span[1]
+                    ] = True
+
+    if np.all(candidate):
+        return _RegularPatternCandidate(mask=candidate, tracking_mask=candidate.copy())
 
     for column_slice in _strip_slices(width):
         plane = relative_luminance(frame[None, :, column_slice, :])[0]
         column_eligible = _alternating_stripe_eligible_signals(plane, axis=0)
-        for column_index in np.flatnonzero(column_eligible):
-            column = plane[:, column_index]
-            span = _alternating_stripe_span(column)
-            if span is not None:
-                candidate[span[0] : span[1], column_slice.start + column_index] = True
-    return candidate
+        uniform_span = _uniform_stripe_span(
+            plane, axis=0, eligible=column_eligible
+        )
+        if uniform_span is not None:
+            candidate[
+                uniform_span[0] : uniform_span[1], column_slice
+            ] = True
+        else:
+            for column_index in np.flatnonzero(column_eligible):
+                column = plane[:, column_index]
+                span = _alternating_stripe_span(column)
+                if span is not None:
+                    candidate[
+                        span[0] : span[1], column_slice.start + column_index
+                    ] = True
+    lattice = _regular_lattice_candidate(frame, covered=candidate)
+    candidate |= lattice.mask
+    return _RegularPatternCandidate(
+        mask=candidate,
+        tracking_mask=candidate | lattice.tracking_mask,
+    )
 
 
 def _regular_pattern_candidates(
     frame_array: np.ndarray,
     indices: Iterator[int] | range,
-) -> Iterator[tuple[int, np.ndarray]]:
+) -> Iterator[tuple[int, _RegularPatternCandidate]]:
     """Yield candidates in trace order with a bounded parallel work queue."""
     ordered_indices = iter(indices)
     worker_count = min(_REGULAR_PATTERN_WORKERS, len(frame_array))
@@ -539,7 +939,7 @@ def _regular_pattern_candidates(
             yield index, _regular_pattern_candidate(frame_array[index])
         return
     with ThreadPoolExecutor(max_workers=worker_count) as executor:
-        pending: dict[int, Future[np.ndarray]] = {}
+        pending: dict[int, Future[_RegularPatternCandidate]] = {}
         for _ in range(worker_count):
             try:
                 index = next(ordered_indices)
@@ -560,6 +960,159 @@ def _regular_pattern_candidates(
             yield index, candidate
 
 
+def _pattern_contrast_is_reversed(
+    previous_frame: np.ndarray,
+    current_frame: np.ndarray,
+    active: np.ndarray,
+) -> bool:
+    """Return whether the same pattern region reverses its light/dark phase."""
+    count = int(np.count_nonzero(active))
+    if count < 2:
+        return False
+    changed = False
+    for row_slice in _strip_slices(len(active)):
+        local_active = active[row_slice]
+        if np.any(local_active) and np.any(
+            previous_frame[row_slice][local_active]
+            != current_frame[row_slice][local_active]
+        ):
+            changed = True
+            break
+    if not changed:
+        return False
+    sum_previous = 0.0
+    sum_current = 0.0
+    sum_previous_squared = 0.0
+    sum_current_squared = 0.0
+    sum_product = 0.0
+    for row_slice in _strip_slices(len(active)):
+        local_active = active[row_slice]
+        if not np.any(local_active):
+            continue
+        previous = relative_luminance(previous_frame[None, row_slice])[0][
+            local_active
+        ]
+        current = relative_luminance(current_frame[None, row_slice])[0][
+            local_active
+        ]
+        sum_previous += float(np.sum(previous))
+        sum_current += float(np.sum(current))
+        sum_previous_squared += float(np.dot(previous, previous))
+        sum_current_squared += float(np.dot(current, current))
+        sum_product += float(np.dot(previous, current))
+    covariance = sum_product - (sum_previous * sum_current / count)
+    previous_variance = sum_previous_squared - sum_previous**2 / count
+    current_variance = sum_current_squared - sum_current**2 / count
+    if previous_variance <= 0.0 or current_variance <= 0.0:
+        return False
+    correlation = covariance / np.sqrt(previous_variance * current_variance)
+    return bool(correlation <= -_LATTICE_PHASE_AGREEMENT)
+
+
+def _matching_pattern_translation(
+    previous_frame: np.ndarray,
+    current_frame: np.ndarray,
+    previous_tracking: np.ndarray,
+    current_tracking: np.ndarray,
+) -> tuple[float, float] | None:
+    """Return a verified mask-and-pixel translation between adjacent frames."""
+    previous_rows = np.flatnonzero(np.any(previous_tracking, axis=1))
+    previous_columns = np.flatnonzero(np.any(previous_tracking, axis=0))
+    current_rows = np.flatnonzero(np.any(current_tracking, axis=1))
+    current_columns = np.flatnonzero(np.any(current_tracking, axis=0))
+    if not (
+        len(previous_rows)
+        and len(previous_columns)
+        and len(current_rows)
+        and len(current_columns)
+    ):
+        return None
+    previous_center = np.array(
+        (
+            (previous_rows[0] + previous_rows[-1]) / 2.0,
+            (previous_columns[0] + previous_columns[-1]) / 2.0,
+        )
+    )
+    current_center = np.array(
+        (
+            (current_rows[0] + current_rows[-1]) / 2.0,
+            (current_columns[0] + current_columns[-1]) / 2.0,
+        )
+    )
+    displacement = current_center - previous_center
+    rounded = np.rint(displacement).astype(int)
+    if (
+        not np.any(rounded)
+        or np.max(np.abs(displacement - rounded)) > 0.25
+    ):
+        return None
+
+    height, width = previous_tracking.shape
+    dy, dx = int(rounded[0]), int(rounded[1])
+    source_top, source_bottom = max(0, -dy), min(height, height - dy)
+    source_left, source_right = max(0, -dx), min(width, width - dx)
+    target_top, target_bottom = source_top + dy, source_bottom + dy
+    target_left, target_right = source_left + dx, source_right + dx
+    if source_top >= source_bottom or source_left >= source_right:
+        return None
+
+    shifted_previous = previous_tracking[
+        source_top:source_bottom, source_left:source_right
+    ]
+    target_tracking = current_tracking[
+        target_top:target_bottom, target_left:target_right
+    ]
+    intersection = shifted_previous & target_tracking
+    union = shifted_previous | target_tracking
+    if (
+        not np.any(intersection)
+        or np.count_nonzero(intersection) / np.count_nonzero(union) < 0.90
+    ):
+        return None
+    previous_pixels = previous_frame[
+        source_top:source_bottom, source_left:source_right
+    ][intersection]
+    current_pixels = current_frame[
+        target_top:target_bottom, target_left:target_right
+    ][intersection]
+    if float(np.mean(np.all(previous_pixels == current_pixels, axis=-1))) < 0.90:
+        return None
+    return float(displacement[0]), float(displacement[1])
+
+
+def _smooth_translation_frames(
+    translations: list[tuple[float, float] | None],
+) -> list[bool]:
+    """Mark frames belonging to an obvious, sustained one-direction flow."""
+    smooth = [False] * len(translations)
+    start = 1
+    while start < len(translations):
+        first = translations[start]
+        if first is None:
+            start += 1
+            continue
+        stop = start + 1
+        previous = np.asarray(first, dtype=np.float64)
+        while stop < len(translations):
+            current_value = translations[stop]
+            if current_value is None:
+                break
+            current = np.asarray(current_value, dtype=np.float64)
+            cosine = float(
+                np.dot(previous, current)
+                / (np.linalg.norm(previous) * np.linalg.norm(current))
+            )
+            if cosine < _LATTICE_PHASE_AGREEMENT:
+                break
+            previous = current
+            stop += 1
+        if stop - start >= 3:
+            for frame_index in range(start - 1, stop):
+                smooth[frame_index] = True
+        start = stop
+    return smooth
+
+
 def _regular_pattern_localization(
     frame_array: np.ndarray, time_array: np.ndarray
 ) -> tuple[np.ndarray, list[HazardWindow], float]:
@@ -568,40 +1121,63 @@ def _regular_pattern_localization(
     dynamic_frames: list[bool] = []
     spatial_updates: list[float] = []
     fraction_deltas: list[float] = []
-    previous_candidate: np.ndarray | None = None
+    packed_candidates: dict[int, np.ndarray] = {}
+    previous_tracking: np.ndarray | None = None
     previous_frame: np.ndarray | None = None
-    for index, candidate in _regular_pattern_candidates(
+    tracking_fractions: list[float] = []
+    translations: list[tuple[float, float] | None] = []
+    contrast_reversals: list[bool] = []
+    for index, candidate_result in _regular_pattern_candidates(
         frame_array, range(len(frame_array))
     ):
         frame = frame_array[index]
+        candidate = candidate_result.mask
+        tracking = candidate_result.tracking_mask
         fraction = float(np.mean(candidate))
+        tracking_fraction = float(np.mean(tracking))
         fractions.append(fraction)
+        if fraction > 0.25:
+            packed_candidates[index] = np.packbits(candidate.reshape(-1))
+        tracking_fractions.append(tracking_fraction)
         dynamic = False
         spatial_update = 0.0
         fraction_delta = 0.0
-        if previous_candidate is not None and previous_frame is not None:
-            changed = np.any(frame != previous_frame, axis=-1)
-            active = previous_candidate | candidate
-            active_count = int(np.count_nonzero(active))
-            if active_count:
-                changed_count = int(np.count_nonzero(changed & active))
-                dynamic = changed_count / active_count > 0.10
-            spatial_update = float(np.mean(previous_candidate ^ candidate))
-            fraction_delta = fraction - fractions[-2]
+        contrast_reversed = False
+        if previous_tracking is not None and previous_frame is not None:
+            spatial_update = float(np.mean(previous_tracking ^ tracking))
+            fraction_delta = tracking_fraction - tracking_fractions[-2]
+            contrast_reversed = _pattern_contrast_is_reversed(
+                previous_frame,
+                frame,
+                previous_tracking & tracking,
+            )
+            dynamic = spatial_update > 0.0 or contrast_reversed
+            translations.append(
+                _matching_pattern_translation(
+                    previous_frame,
+                    frame,
+                    previous_tracking,
+                    tracking,
+                )
+            )
+        else:
+            translations.append(None)
         dynamic_frames.append(dynamic)
+        contrast_reversals.append(contrast_reversed)
         spatial_updates.append(spatial_update)
         fraction_deltas.append(fraction_delta)
-        previous_candidate = candidate
+        previous_tracking = tracking
         previous_frame = frame
 
     max_fraction = max(fractions, default=0.0)
     smooth_frames = [False] * len(fractions)
     for index in range(1, len(fractions)):
+        prior_flow = index > 1 and smooth_frames[index - 1]
         if spatial_updates[index] == 0.0:
+            smooth_frames[index] = prior_flow and dynamic_frames[index]
             continue
         expanding = fraction_deltas[index] > 0.0
         small_boundary_adjustment = spatial_updates[index] <= 0.02
-        prior_flow = index > 1 and smooth_frames[index - 1]
         following_expansion = (
             index + 1 < len(fractions)
             and spatial_updates[index + 1] > 0.0
@@ -621,24 +1197,33 @@ def _regular_pattern_localization(
         )
         for start in range(1, max(1, len(fractions) - 2))
     )
-    # A stationary candidate mask that changes contrast is an actual dynamic
-    # pattern.  Keep the trace-wide dynamic classification for that case so a
-    # phase reversal cannot evade detection merely because its first frame is
-    # the temporal baseline.  A spatially evolving, one-direction flow is the
-    # narrow exception: evaluate it frame by frame and exempt only its smooth
-    # transition frames.
-    trace_dynamic = any(dynamic_frames)
+    translation_frames = _smooth_translation_frames(translations)
+    smooth_frames = [
+        expansion or translation
+        for expansion, translation in zip(
+            smooth_frames, translation_frames, strict=True
+        )
+    ]
+    has_smooth_one_direction_flow |= any(translation_frames)
+    # Spatial motion applies to its arrival frame.  A verified contrast
+    # reversal has two pattern endpoints, so include the preceding frame too.
+    # This does not let an unrelated later UI update lower the static area
+    # threshold for an earlier frame.
+    dynamic_pattern_frames = [
+        dynamic_frames[index]
+        or (
+            index + 1 < len(contrast_reversals)
+            and contrast_reversals[index + 1]
+        )
+        for index in range(len(dynamic_frames))
+    ]
     qualifying_frames = [
         index
         for index, fraction in enumerate(fractions)
         if regular_pattern_is_hazardous(
             stripe_pairs=6,
             affected_fraction=fraction,
-            dynamic=(
-                dynamic_frames[index]
-                if has_smooth_one_direction_flow
-                else trace_dynamic
-            ),
+            dynamic=dynamic_pattern_frames[index],
             smooth_one_direction=(
                 smooth_frames[index] if has_smooth_one_direction_flow else False
             ),
@@ -649,9 +1234,13 @@ def _regular_pattern_localization(
 
     mask = np.zeros(frame_array.shape[:3], dtype=bool)
     active_frames: list[int] = []
-    for index, candidate in _regular_pattern_candidates(frame_array, iter(qualifying_frames)):
-        if np.any(candidate):
-            mask[index] = candidate
+    pixels_per_frame = frame_array.shape[1] * frame_array.shape[2]
+    for index in qualifying_frames:
+        packed = packed_candidates.get(index)
+        if packed is not None:
+            mask[index] = np.unpackbits(packed, count=pixels_per_frame).reshape(
+                frame_array.shape[1:3]
+            )
             active_frames.append(index)
 
     windows: list[HazardWindow] = []

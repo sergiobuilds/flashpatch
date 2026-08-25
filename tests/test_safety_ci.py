@@ -946,7 +946,8 @@ def test_renderer_rejects_runtime_provenance_mismatch(tmp_path: Path, field: str
         def replay(self, trace: Path, output: Path) -> dict[str, object]:
             patched = "burst_intensity: float = 0.0" in (self.project / "main.gd").read_text()
             frames = np.zeros((8, 8, 8, 3), dtype=np.uint8)
-            if not patched: frames[1::2] = 255
+            if not patched:
+                frames[1::2] = 255
             artifact = output.with_name("frames.npz")
             np.savez_compressed(artifact, frames=frames, timestamps=np.arange(8, dtype=np.float64) / 10.0)
             event = {"frame_index": 1, "timestamp_us": 1, "node_path": "/root/InteractionBurst", "resource_path": "res://main.tscn", "script_path": "res://main.gd", "source_line": 3, "property": "burst_intensity", "factual_value": 1.0, "event_kind": "render_property"}
@@ -975,7 +976,8 @@ def test_renderer_never_combines_two_parameters_to_create_a_pass(tmp_path: Path)
             text = (self.project / "main.gd").read_text()
             both = "burst_intensity: float = 0.0" in text and "secondary_intensity: float = 0.0" in text
             frames = np.zeros((8, 8, 8, 3), dtype=np.uint8)
-            if not both: frames[1::2] = 255
+            if not both:
+                frames[1::2] = 255
             artifact = output.with_name("frames.npz")
             np.savez_compressed(artifact, frames=frames, timestamps=np.arange(8, dtype=np.float64) / 10.0)
             burst_value = 0.0 if "burst_intensity: float = 0.0" in text else 1.0

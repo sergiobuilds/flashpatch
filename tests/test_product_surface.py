@@ -1,27 +1,18 @@
 from __future__ import annotations
 
 import json
-import shutil
 import subprocess
 import sys
 import threading
-import os
 from pathlib import Path
 from urllib.request import Request, urlopen
 
 import numpy as np
-import pytest
-
 from flashpatch import repair_video, scan_video, verify_video
 from flashpatch.media import VideoMetadata, write_video
 from flashpatch.web import create_server
 
 ROOT = Path(__file__).parents[1]
-
-
-def _godot_runtime_available() -> bool:
-    candidate = Path(os.environ.get("GODOT_BINARY", ROOT / ".tools" / "godot"))
-    return candidate.is_file() and os.access(candidate, os.X_OK)
 
 
 def _hazard_video(path: Path) -> VideoMetadata:
@@ -83,22 +74,31 @@ def test_installed_cli_and_ci_contract_are_executable() -> None:
     assert "public release audit passed" in boundary.stdout
 
 
-@pytest.mark.skipif(not _godot_runtime_available(), reason="requires declared Godot runtime")
 def test_safety_demo_writes_all_terminal_receipts(tmp_path: Path) -> None:
     completed = subprocess.run(
-        [sys.executable, "-m", "flashpatch.cli", "safety-demo", "--output", str(tmp_path)],
+        [
+            sys.executable,
+            "-m",
+            "flashpatch.cli",
+            "safety-demo",
+            "--json",
+            "--output",
+            str(tmp_path),
+        ],
         check=True,
         capture_output=True,
         text=True,
         cwd=ROOT,
     )
     assert json.loads(completed.stdout)["results"] == {
+        "fail": "FAIL",
+        "inconclusive": "INCONCLUSIVE",
         "pass": "PASS",
         "safe": "SAFE",
-        "inconclusive": "INCONCLUSIVE",
     }
     assert json.loads((tmp_path / "pass-receipt.json").read_text())["verdict"] == "PASS"
     assert json.loads((tmp_path / "safe-receipt.json").read_text())["verdict"] == "SAFE"
+    assert json.loads((tmp_path / "fail-receipt.json").read_text())["verdict"] == "FAIL"
     assert json.loads((tmp_path / "inconclusive-receipt.json").read_text())["verdict"] == "INCONCLUSIVE"
 
 
@@ -128,7 +128,7 @@ def test_browser_judge_flow_uploads_repairs_and_downloads(tmp_path: Path) -> Non
         server.server_close()
         thread.join(timeout=5)
 
-    assert "Temporal visual-risk scan" in page
+    assert "WCAG 2.2" in page
     assert "Upload video" in page
     assert payload["scan"]["hazardous"] is True
     assert payload["repair"]["status"] == "VERIFIED"
