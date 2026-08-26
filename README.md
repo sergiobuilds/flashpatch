@@ -1,41 +1,45 @@
 # FlashPatch
 
-**Fail-closed visual QA for game development.** FlashPatch traces a rendered visual hazard to one permitted source edit, then replays the same gameplay trace to prove that risk fell without gameplay drift.
+**FlashPatch는 게임의 위험한 번쩍임을 찾고, 원인 코드 한 곳을 고친 뒤, 수정 전과 같은 입력·상태로 장면을 다시 실행해 게임이 망가지지 않았는지 확인합니다.**
 
-Contents: [비교](#1-기존-도구와의-차이) · [한국어 요약](#2-한국어-요약) · [Problem](#3-the-problem) · [Quickstart](#4-anonymous-clone-and-30-second-demo) · [Verdicts](#5-what-a-verdict-means) · [Replay contract](#7-the-replay-contract) · [Engine scope](#8-engine-scope) · [Development](#10-development-and-public-release-checks) · [License and SBOM](#11-license-and-sbom)
+_Fail-closed visual QA for game development: one source edit, the same gameplay replayed, and a hash-bound verification record._
 
-## 1 기존 도구와의 차이
+Contents: [비교](#1-기존-도구보다-무엇을-더-합니까) · [한국어 요약](#2-한국어-요약) · [Problem](#3-the-problem) · [Quickstart](#4-anonymous-clone-and-30-second-demo) · [Verdicts](#5-what-a-verdict-means) · [Replay contract](#7-the-replay-contract) · [Engine scope](#8-engine-scope) · [Development](#10-development-and-public-release-checks) · [License and SBOM](#11-license-and-sbom)
 
-기존 공개 도구는 대체로 위험을 탐지하거나 완화된 영상을 만드는 데서 끝납니다. FlashPatch는 실제 렌더러에서 발견한 위험을 실행 중인 소스 원인에 연결하고, 허용된 소스 변수 하나만 바꾼 뒤, 같은 플레이를 다시 실행해 게임 상태까지 보존됐을 때만 통과시킵니다.
+## 1 기존 도구보다 무엇을 더 합니까
 
-### 1.1 기능 비교
+폭발 효과가 너무 강하게 번쩍인다고 가정해 보겠습니다.
 
-`확인`은 공식 공개 소스 또는 고정 revision 감사에서 기능을 확인했다는 뜻입니다. `없음`은 검사한 공개 표면에서 해당 기능을 확인하지 못했다는 뜻입니다. 탐지기, 영상 완화기, runtime 보호기는 서로 다른 제품군이므로 빈 칸을 품질 점수로 해석하지 않습니다.
+1. **찾습니다.** 실제 게임 화면에서 위험한 순간을 잡습니다.
+2. **원인을 고칩니다.** 그 순간에 실행된 효과와 소스 변수를 연결하고, 허용된 값 하나만 바꿔 시험합니다.
+3. **게임을 다시 확인합니다.** 수정 전과 같은 조작과 상태로 장면을 재실행합니다. 번쩍임은 줄고 플레이 결과는 같을 때만 `PASS`를 남깁니다.
 
-| 프로젝트 | 시간 기반 위험 탐지 | 수정 산출물 생성 | 수정본 재검사 | runtime 소스 원인 연결 | 소스 변수 하나 시험 | 게임 상태 보존 검사 | hash-bound 최종 receipt |
-|---|---|---|---|---|---|---|---|
-| [EA IRIS](https://github.com/electronicarts/IRIS) | 확인 | 없음 | 해당 없음 | 없음 | 없음 | 없음 | 없음 |
-| [TooFlashy](https://github.com/hashb/TooFlashy) | 확인 | 없음 | 해당 없음 | 없음 | 없음 | 없음 | 없음 |
-| [Q6](https://github.com/qwertey6/Q6) | 확인 | 완화 제안만 제공 | 해당 없음 | 없음 | 없음 | 없음 | 없음 |
-| [EPI-LENS](https://github.com/Pi-0r-Tau/EPI-LENS) | 확인 | 없음 | 해당 없음 | 없음 | 없음 | 없음 | 없음 |
-| [FFmpeg `photosensitivity`](https://ffmpeg.org/ffmpeg-filters.html#photosensitivity) | 내부 trigger | 확인 | 없음 | 없음 | 없음 | 없음 | 없음 |
-| [Apple VideoFlashingReduction](https://github.com/apple/VideoFlashingReduction) | 확인 | 확인 | 없음 | 없음 | 없음 | 없음 | 없음 |
-| [Kaya `pse-detection-correction`](https://github.com/samfatu/pse-detection-correction) | 확인 | 확인 | 없음 | 없음 | 없음 | 없음 | 없음 |
-| [Unflash](https://github.com/Kelardry/unflash-video) | 확인 | 확인 | 확인 | 없음 | 없음 | 없음 | 없음 |
-| **FlashPatch** | **확인** | **확인** | **확인** | **확인** | **확인** | **확인** | **확인** |
+차이는 1번이 아니라 **2번과 3번까지 한 흐름으로 끝낸다**는 점입니다. 증거가 부족하거나 게임 상태가 달라지면 성공으로 꾸미지 않고 `INCONCLUSIVE`로 종료합니다.
 
-비교 대상은 기존 공개 저장소 조사와 2026년 8월 26일 재검색에서 확인한 프로젝트입니다. 같은 구현 계열은 가능한 한 대표 프로젝트 하나만 포함했습니다.
+### 1.1 사용하고 나면 무엇이 남습니까
 
-### 1.2 측정 결과
+| 현재 공개 도구 | 도구가 주는 결과 | 개발자가 이어서 해야 하는 일 |
+|---|---|---|
+| [Ubisoft Chroma](https://github.com/ubisoft/Chroma) | 플레이 화면의 색각 이상 시뮬레이션 | 문제를 판단하고 디자인·소스를 고친 뒤 다시 시험 |
+| [EA IRIS](https://github.com/electronicarts/IRIS), [TooFlashy](https://github.com/hashb/TooFlashy), [Q6](https://github.com/qwertey6/Q6), [EPI-LENS](https://github.com/Pi-0r-Tau/EPI-LENS) | 위험이 발생한 시각 또는 분석 보고서 | 원인 코드를 찾고 수정한 뒤 같은 장면을 다시 시험 |
+| [FFmpeg](https://ffmpeg.org/ffmpeg-filters.html#photosensitivity), [Apple VideoFlashingReduction](https://github.com/apple/VideoFlashingReduction), [Kaya](https://github.com/samfatu/pse-detection-correction) | 번쩍임을 줄인 영상 | 실제 게임 소스의 원인과 플레이 부작용을 별도로 확인 |
+| [Unflash](https://github.com/Kelardry/unflash-video) | 수정하고 다시 검사한 영상 | 실제 게임 소스 수정과 게임 상태 보존을 별도로 확인 |
+| **FlashPatch** | **원인 소스 변수 한 곳의 수정안, 같은 입력·상태의 재실행 결과, 해시로 묶인 검증 기록** | **검증 기록을 검토해 실제 작업 브랜치에 반영. 증거가 부족하면 `INCONCLUSIVE`의 원인을 해결** |
 
-| 측정 항목 | FlashPatch | 비교 대상 | 범위 |
-|---|---:|---:|---|
-| 탐지 결과 정확 일치 | 7/9 cases | Kaya 8/9, TooFlashy 8/9 | 공개 Godot renderer 사례 9건. 탐지 전용 수치에서는 FlashPatch가 앞서지 않음 |
-| 봉인 탐지 정확도 | 3/3 cases | EA IRIS 3/3, EPI-LENS 1/3 | 영상 보조 benchmark 3건 |
-| 완화 후 잔존 위험 | 0% | FFmpeg 0% | 동일한 봉인 사례 3건 |
-| 평균 변경 pixel 비율 | **25.00%** | FFmpeg 45.83% | 같은 위험 제거 결과에서 FFmpeg보다 변경 pixel이 45.5% 적음 |
+Ubisoft Chroma는 색각 이상, FlashPatch는 광과민성 번쩍임을 다루므로 탐지 성능을 직접 겨루는 경쟁품은 아닙니다. 다만 접근성 QA의 **완료 지점**은 비교할 수 있습니다. Chroma가 문제를 실시간으로 보여 주어 사람이 수정하도록 돕는다면, FlashPatch의 검증된 Godot 경로는 원인 소스 수정 시험과 동일 플레이 재검증까지 이어집니다.
 
-측정 원본은 [`benchmarks/direct-baseline/results.json`](benchmarks/direct-baseline/results.json)에 있습니다. FlashPatch의 핵심 우위는 탐지 점수 하나가 아니라 `렌더러 frame → runtime 원인 → source diff 하나 → 동일 trace 재실행 → gameplay 보존`을 한 번에 검증하는 구조입니다.
+이 표는 2026년 8월 26일에 공식 공개 설명과 고정 revision을 다시 확인한 결과입니다. 공개 검색에서 발견하지 못한 프로젝트까지 없다고 주장하지 않으며, 서로 다른 제품군의 빈 기능을 전체 품질 점수로 사용하지 않습니다.
+
+### 1.2 수치로 확인한 결과
+
+| 질문 | 결과 | 해석 |
+|---|---|---|
+| 탐지만 더 정확합니까 | FlashPatch 7/9, Kaya 8/9, TooFlashy 8/9 | **아닙니다.** 탐지 전용 수치에서는 FlashPatch가 앞서지 않습니다. |
+| 위험을 없앴습니까 | FlashPatch 0%, FFmpeg 0% 잔존 위험 | 봉인 영상 사례 3건에서는 둘 다 위험을 제거했습니다. |
+| 화면을 얼마나 덜 바꿨습니까 | FlashPatch 25.00%, FFmpeg 45.83% 변경 픽셀 | 같은 사례에서 FlashPatch가 바꾼 픽셀이 상대적으로 45.5% 적었습니다. |
+| 게임 수정까지 검증했습니까 | **FlashPatch만 전체 흐름 확인** | 공개 비교군 중 `화면 → 원인 소스 → 수정 하나 → 같은 플레이 → 상태 보존`을 controlled Godot 사례에서 확인했습니다. |
+
+영상 보조 탐지 결과는 FlashPatch 3/3, EA IRIS 3/3, EPI-LENS 1/3이었습니다. 원시 측정값과 실행 조건은 [`benchmarks/direct-baseline/results.json`](benchmarks/direct-baseline/results.json)에 고정돼 있습니다. 현재 source-bound 검증 범위는 Godot이며, Unity와 Unreal 전체 지원을 뜻하지 않습니다.
 
 ## 2 한국어 요약
 
@@ -192,6 +196,6 @@ CI runs the portable regression subset on Python 3.11 and 3.12 across Linux, Win
 
 ## 12 Change history
 
-- 2026-08-26: added the audited capability comparison and separated measured detector and mitigation results from the source-bound product claim.
+- 2026-08-26: replaced the capability grid with a blind-reviewed, task-oriented comparison and added the current Ubisoft Chroma boundary.
 - 2026-08-25: synchronized the source package with the final candidate, added the four-state installed demo, and hardened the public boundary against private paths and a missing SBOM.
 - 2026-08-24: documented anonymous non-editable installation, separated the engine-free and Godot-backed demos, and added public-boundary and SBOM verification.
