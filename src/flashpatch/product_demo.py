@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import re
+
+import numpy as np
 
 from .safety_ci import compile_project, write_receipt
 
@@ -102,6 +105,76 @@ class DemoReplayRunner:
         return replay
 
 
+class GameplayDriftReplayRunner(DemoReplayRunner):
+    """Makes the candidate visually safe while changing the declared game state."""
+
+    def replay(self, trace: Path | str, output: Path | str) -> dict[str, object]:
+        replay = super().replay(trace, output)
+        source = (self.project / "main.gd").read_text(encoding="utf-8")
+        match = _EXPORTED_INTENSITY.search(source)
+        if match is not None and float(match.group(1)) == 0.0:
+            replay["gameplay_state"] = "actions:4|charged:0|score:changed"
+            Path(output).write_text(
+                json.dumps(replay, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+        return replay
+
+
+class MultiParameterReplayRunner(DemoReplayRunner):
+    """Requires two source edits so no declared single candidate may pass."""
+
+    def replay(self, trace: Path | str, output: Path | str) -> dict[str, object]:
+        source = (self.project / "main.gd").read_text(encoding="utf-8")
+        primary = _EXPORTED_INTENSITY.search(source)
+        secondary = re.search(
+            r"^@export var secondary_intensity:\s*float\s*=\s*([0-9.]+)\s*$",
+            source,
+            re.MULTILINE,
+        )
+        if primary is None or secondary is None:
+            raise RuntimeError("multi-parameter demo fixture lost a declared assignment")
+        combined = max(float(primary.group(1)), float(secondary.group(1)))
+        trace_payload = json.loads(Path(trace).read_text(encoding="utf-8"))
+        observations = [combined if action.get("fire") is True else 0.0 for action in trace_payload["actions"]]
+        replay = {
+            "fixed_fps": trace_payload["fixed_fps"],
+            "action_frames": [action["frame"] for action in trace_payload["actions"]],
+            "gameplay_state": "actions:4|charged:0",
+            "observations": observations,
+            "status": "REPLAYED",
+        }
+        Path(output).write_text(json.dumps(replay, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        return replay
+
+
+class MissingTimestampsReplayRunner:
+    """Emits renderer frames without the timestamps required for a verdict."""
+
+    def __init__(self, project: Path | str) -> None:
+        self.project = Path(project)
+
+    def replay(self, trace: Path | str, output: Path | str) -> dict[str, object]:
+        output_path = Path(output)
+        artifact = output_path.with_name("frames-without-timestamps.npz")
+        frames = np.zeros((4, 8, 8, 3), dtype=np.uint8)
+        frames[1::2] = 255
+        np.savez_compressed(artifact, frames=frames)
+        replay = {
+            "status": "REPLAYED",
+            "frames_npz": artifact.name,
+            "renderer_capture": {
+                "trace_sha256": f"sha256:{hashlib.sha256(Path(trace).read_bytes()).hexdigest()}",
+                "godot_version": "demo-fixture",
+                "renderer_configuration": {"display_driver": "x11", "rendering_driver": "opengl3"},
+            },
+            "action_frames": [0, 1, 2, 3],
+            "gameplay_state": "stable",
+        }
+        output_path.write_text(json.dumps(replay, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        return replay
+
+
 def _write_project(
     project: Path,
     *,
@@ -193,6 +266,64 @@ def run_safety_demo(output: Path | str) -> dict[str, object]:
     passed = _run_case("pass", pass_project, pass_contract, output_path)
     safe = _run_case("safe", safe_project, safe_contract, output_path)
     failed = _run_case("fail", fail_project, fail_contract, output_path)
+
+    gameplay_drift = compile_project(
+        pass_project,
+        pass_contract,
+        workspace=output_path / "gameplay-drift-work",
+        runner_factory=GameplayDriftReplayRunner,
+    )
+    gameplay_drift["demonstration"] = dict(_DEMONSTRATION)
+    write_receipt(gameplay_drift, output_path / "gameplay-drift-receipt.json")
+
+    multi_project = fixture_root / "multi-parameter-project"
+    multi_contract_path = _write_project(
+        multi_project,
+        trace=_HAZARDOUS_TRACE,
+        replacement=0.0,
+    )
+    (multi_project / "main.gd").write_text(
+        _SCRIPT + "@export var secondary_intensity: float = 1.0\n",
+        encoding="utf-8",
+    )
+    multi_contract = json.loads(multi_contract_path.read_text(encoding="utf-8"))
+    multi_contract["patch_candidates"].append(
+        {
+            "source": "main.gd",
+            "parameter": "secondary_intensity",
+            "parameter_kind": "intensity",
+            "replacement": 0.0,
+        }
+    )
+    multi_contract_path.write_text(json.dumps(multi_contract, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    multi_parameter = compile_project(
+        multi_project,
+        multi_contract_path,
+        workspace=output_path / "multi-parameter-work",
+        runner_factory=MultiParameterReplayRunner,
+    )
+    multi_parameter["demonstration"] = dict(_DEMONSTRATION)
+    write_receipt(multi_parameter, output_path / "multi-parameter-receipt.json")
+
+    missing_timestamps_contract = json.loads(pass_contract.read_text(encoding="utf-8"))
+    missing_timestamps_contract["risk_signal"] = {
+        "kind": "frame_npz_v1",
+        "field": "frames_npz",
+        "threshold": 1.0,
+    }
+    missing_timestamps_path = pass_project / "missing-timestamps.contract.json"
+    missing_timestamps_path.write_text(
+        json.dumps(missing_timestamps_contract, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    missing_timestamps = compile_project(
+        pass_project,
+        missing_timestamps_path,
+        workspace=output_path / "missing-timestamps-work",
+        runner_factory=MissingTimestampsReplayRunner,
+    )
+    missing_timestamps["demonstration"] = dict(_DEMONSTRATION)
+    write_receipt(missing_timestamps, output_path / "missing-timestamps-receipt.json")
     inconclusive = compile_project(
         pass_project,
         pass_project / "missing-contract.json",
@@ -216,6 +347,47 @@ def run_safety_demo(output: Path | str) -> dict[str, object]:
     }
     if results != expected:
         raise RuntimeError(f"safety demo terminal states are invalid: {results}")
+
+    reversal_receipts = {
+        "residual_risk": failed,
+        "gameplay_state_drift": gameplay_drift,
+        "multiple_parameters_required": multi_parameter,
+        "missing_renderer_timestamps": missing_timestamps,
+        "already_safe": safe,
+    }
+    reversal_expected = {
+        "residual_risk": "FAIL",
+        "gameplay_state_drift": "FAIL",
+        "multiple_parameters_required": "INCONCLUSIVE",
+        "missing_renderer_timestamps": "INCONCLUSIVE",
+        "already_safe": "SAFE",
+    }
+    if {name: receipt["verdict"] for name, receipt in reversal_receipts.items()} != reversal_expected:
+        raise RuntimeError("safety demo failure reversals are invalid")
+    reversal_paths = {
+        "residual_risk": output_path / "fail-receipt.json",
+        "gameplay_state_drift": output_path / "gameplay-drift-receipt.json",
+        "multiple_parameters_required": output_path / "multi-parameter-receipt.json",
+        "missing_renderer_timestamps": output_path / "missing-timestamps-receipt.json",
+        "already_safe": output_path / "safe-receipt.json",
+    }
+    failure_matrix = {
+        "schema": "flashpatch-failure-reversal-matrix-v1",
+        "evidence_scope": "deterministic_contract_fixture",
+        "cases": {
+            name: {
+                "expected_verdict": reversal_expected[name],
+                "actual_verdict": receipt["verdict"],
+                "reason": receipt["reason"],
+                "receipt": _receipt_reference(reversal_paths[name]),
+            }
+            for name, receipt in reversal_receipts.items()
+        },
+    }
+    (output_path / "failure-matrix.json").write_text(
+        json.dumps(failure_matrix, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
     factual_path = Path(str(passed["factual_replay"]["artifact"]))
     factual = json.loads(factual_path.read_text(encoding="utf-8"))
@@ -261,6 +433,7 @@ def run_safety_demo(output: Path | str) -> dict[str, object]:
             },
         },
         "results": results,
+        "failure_reversals": failure_matrix,
         "receipts": {
             name: _receipt_reference(output_path / f"{name}-receipt.json")
             for name in expected

@@ -291,7 +291,7 @@ def test_unity_matrix_cli_fails_closed_before_creating_output(tmp_path: Path) ->
             sys.executable,
             "-m",
             "flashpatch.cli",
-            "l10-unity-run",
+            "unity-renderer-run",
             "--factual-template", str(missing),
             "--counterfactual-template", str(missing),
             "--factual-manifest", str(missing),

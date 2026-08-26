@@ -1,0 +1,50 @@
+{
+  "schema": "flashpatch-engine-coverage-v1",
+  "product_scope": "game-engine visual safety evidence and source-bound correction",
+  "engines": [
+    {
+      "engine": "Godot",
+      "version": "4.7.1.stable.official.a13da4feb",
+      "public_workflow": "actual renderer capture -> source attribution -> one source edit -> same-trace replay -> receipt verification",
+      "evidence_class": "public_end_to_end",
+      "verdict": "PASS",
+      "actual_renderer_frames": true,
+      "source_bound_correction": true,
+      "gameplay_state_preserved": true,
+      "public_receipt": "godot-demo/receipt.json",
+      "public_receipt_file_sha256": "sha256:2e692fd4e8e236ade735c896c75cd2a725c0b0494beb0b59bef0d1cbd6c64674"
+    },
+    {
+      "engine": "Unreal Engine",
+      "version": "5.6.0-43139311+UE5",
+      "public_workflow": "controlled actual-renderer capture and runtime-parameter correction verification",
+      "evidence_class": "controlled_renderer",
+      "verdict": "PASS",
+      "actual_renderer_frames": true,
+      "source_bound_correction": false,
+      "gameplay_state_preserved": true,
+      "preservation": {
+        "action_sequence": true,
+        "object_identity": true,
+        "terminal_state": true,
+        "timing": true,
+        "visual_intent": true
+      },
+      "verified_receipt_file_sha256": "sha256:87d6872eac1615b46df5bf800912e2565aa2e5e4c28d40886dba4b15dd655093",
+      "limitation": "Controlled runtime-parameter evidence; not a production source-repair adapter."
+    },
+    {
+      "engine": "Unity",
+      "version": "2022.3.8f1",
+      "public_workflow": "manifest-bound source preflight before editor import",
+      "evidence_class": "source_preflight_with_incomplete_renderer_evidence",
+      "verdict": "INCONCLUSIVE",
+      "actual_renderer_frames": true,
+      "source_bound_correction": false,
+      "gameplay_state_preserved": false,
+      "verified_receipt_file_sha256": "sha256:686369ddcc4994edd0d31420c7bfc7321ea6cb5741698da39f70c6325bc1c05a",
+      "reason": "factual_capture_did_not_establish_hazard_removal__and__capture_artifacts_were_not_reproducible__and__gameplay_state_was_not_preserved",
+      "limitation": "Public support is source preflight today; production renderer repair is not established."
+    }
+  ]
+}

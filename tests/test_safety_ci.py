@@ -30,7 +30,7 @@ from flashpatch.safety_ci import (
 
 
 ROOT = Path(__file__).parents[1]
-SMOKE_PROJECT = ROOT / "benchmarks" / "aigame-psebench" / "corpus" / "interaction-burst"
+SMOKE_PROJECT = ROOT / "examples" / "godot" / "interaction-burst"
 SMOKE_CONTRACT = SMOKE_PROJECT / "flashpatch.contract.json"
 
 
@@ -678,8 +678,8 @@ def test_frame_npz_contract_rejects_hazard_removal_when_gameplay_changes(tmp_pat
 
     receipt = compile_project(project, contract_path, workspace=tmp_path / "work", runner_factory=StateBreakingRunner)
 
-    assert receipt["verdict"] == "INCONCLUSIVE"
-    assert receipt["reason"] == "hazard_removed_but_gameplay_preservation_failed"
+    assert receipt["verdict"] == "FAIL"
+    assert receipt["reason"] == "patch_broke_declared_gameplay_invariants"
 
 
 def test_frame_npz_contract_rejects_wrong_runtime_node(tmp_path: Path) -> None:
@@ -987,4 +987,5 @@ def test_renderer_never_combines_two_parameters_to_create_a_pass(tmp_path: Path)
             return payload
 
     receipt = compile_project(project, contract_path, workspace=tmp_path / "work", runner_factory=RequiresBothRunner)
-    assert receipt["verdict"] == "FAIL"
+    assert receipt["verdict"] == "INCONCLUSIVE"
+    assert receipt["reason"] == "multiple_parameters_required_no_single_patch_authorized"

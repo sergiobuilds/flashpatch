@@ -130,7 +130,7 @@ def _verify_unity_git_source(source: Path) -> dict[str, str]:
 
 
 def _verify_godot_git_source(source: Path) -> dict[str, str]:
-    repository = "https://github.com/sergiobuilds/flashpatch-public"
+    repository = "https://github.com/sergiobuilds/flashpatch"
     revision = "9e5fc3bcc922984a05a9edf32c664b85eb76dad3"
     tree_sha256 = "a7981ea1f18849f89d9cccda249152c91aa3a8e43c90732482a980f370e5af46"
     if not (source / ".git").is_dir():
@@ -149,7 +149,7 @@ def _verify_godot_git_source(source: Path) -> dict[str, str]:
     listing = _git_output(source, "ls-tree", "-r", "HEAD").encode()
     if hashlib.sha256(listing).hexdigest() != tree_sha256:
         raise L10EvidenceError("pinned Godot source tree listing changed")
-    relative_root = Path("benchmarks/aigame-psebench/corpus/interaction-burst")
+    relative_root = Path("examples/godot/interaction-burst")
     expected = {
         "flashpatch.contract.json",
         "flashpatch.renderer.contract.json",
@@ -860,7 +860,7 @@ def _promote_godot_controlled_runtime(
     version = completed.stdout.strip()
     if version != "4.7.1.stable.official.a13da4feb":
         raise L10EvidenceError("frozen Godot binary version changed")
-    fixture = source / "benchmarks/aigame-psebench/corpus/interaction-burst"
+    fixture = source / "examples/godot/interaction-burst"
     factual_source = fixture / "main.gd"
     trace_source = fixture / "trace.json"
     license_source = source / "LICENSE"
@@ -999,7 +999,7 @@ def _promote_godot_controlled_runtime(
             "source": {**source_identity, "provenance": source_provenance},
             "license": {"spdx": "Apache-2.0", "artifact": license_ref},
             "scene": {
-                "source_path": "benchmarks/aigame-psebench/corpus/interaction-burst/main.gd",
+                "source_path": "examples/godot/interaction-burst/main.gd",
                 "artifact": factual_scene,
                 "counterfactual_artifact": candidate_scene,
             },
@@ -1054,7 +1054,7 @@ def promote_godot_controlled_evidence(
     _verify_godot_git_source(source)
     if not (os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")):
         raise L10EvidenceError("Godot evidence promotion requires an actual renderer display")
-    fixture = source / "benchmarks/aigame-psebench/corpus/interaction-burst"
+    fixture = source / "examples/godot/interaction-burst"
     contract = fixture / "flashpatch.renderer.contract.json"
     run_nonces = {
         label: {lane: secrets.token_hex(32) for lane in ("factual", "counterfactual")}

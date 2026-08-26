@@ -431,7 +431,7 @@ def test_godot_promotion_requires_live_renderer_before_any_run(
         l10_evidence,
         "_verify_godot_git_source",
         lambda source: {
-            "repository": "https://github.com/sergiobuilds/flashpatch-public",
+            "repository": "https://github.com/sergiobuilds/flashpatch",
             "revision": "9e5fc3bcc922984a05a9edf32c664b85eb76dad3",
             "tree_sha256": "a7981ea1f18849f89d9cccda249152c91aa3a8e43c90732482a980f370e5af46",
         },
@@ -453,7 +453,7 @@ def test_godot_source_rejects_hidden_index_flags(
     def git_output(_source: Path, *args: str) -> str:
         command = tuple(args)
         if command == ("remote", "get-url", "origin"):
-            return "https://github.com/sergiobuilds/flashpatch-public.git\n"
+            return "https://github.com/sergiobuilds/flashpatch.git\n"
         if command == ("rev-parse", "HEAD"):
             return "9e5fc3bcc922984a05a9edf32c664b85eb76dad3\n"
         if command == ("status", "--porcelain=v1", "--untracked-files=all"):

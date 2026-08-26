@@ -10,9 +10,6 @@ artifacts/
 uv.lock
 
 # Comparison results and generated patch examples remain outside the public source release.
-/benchmarks/aigame-psebench/baseline-league.json
-/benchmarks/aigame-psebench/results.json
-/benchmarks/aigame-psebench/source-patches/
 
 docs/research/2026-100-YEAR-GLOBAL-LIFE-PROBLEMS.md
 docs/research/2026-100-YEAR-GLOBAL-LIFE-PROBLEMS-v2.md
