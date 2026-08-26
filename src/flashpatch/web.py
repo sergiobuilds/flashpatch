@@ -11,7 +11,7 @@ from .product import repair_video, scan_video, verify_video
 
 PAGE = b"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>FlashPatch judge demo</title><style>
+<title>FlashPatch Visual Safety Demo</title><style>
 body{font:16px system-ui;max-width:760px;margin:3rem auto;padding:0 1rem}button{padding:.7rem 1rem}
 pre{white-space:pre-wrap;background:#f4f4f4;padding:1rem}video{max-width:100%}
 </style></head><body><h1>FlashPatch</h1>

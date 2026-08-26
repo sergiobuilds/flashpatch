@@ -6,11 +6,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from flashpatch.submission_demo import (
-    SubmissionDemoError,
-    format_submission_godot_demo,
-    run_submission_godot_demo,
-    verify_submission_godot_demo,
+from flashpatch.godot_proof import (
+    GodotProofError,
+    format_godot_proof,
+    run_godot_proof,
+    verify_godot_proof,
 )
 
 
@@ -83,11 +83,11 @@ def test_godot_demo_exports_verifiable_public_evidence(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     engine = _fake_pass_engine(tmp_path)
-    monkeypatch.setattr("flashpatch.submission_demo.compile_project", lambda *args, **kwargs: engine)
+    monkeypatch.setattr("flashpatch.godot_proof.compile_project", lambda *args, **kwargs: engine)
     output = tmp_path / "public-demo"
 
-    receipt = run_submission_godot_demo(PROJECT, CONTRACT, output)
-    verification = verify_submission_godot_demo(output / "receipt.json")
+    receipt = run_godot_proof(PROJECT, CONTRACT, output)
+    verification = verify_godot_proof(output / "receipt.json")
 
     assert receipt["verdict"] == "PASS"
     assert receipt["hazard"]["before"]["max_risk"] == 5.0
@@ -104,7 +104,7 @@ def test_godot_demo_exports_verifiable_public_evidence(
         "engine-receipt.json",
     }
     assert "/home/" not in (output / "engine-receipt.json").read_text(encoding="utf-8")
-    rendered = format_submission_godot_demo(receipt, output)
+    rendered = format_godot_proof(receipt, output)
     assert "actual Godot frames" in rendered
     assert "RESULT    PASS risk=5.0 -> 0.0" in rendered
 
@@ -114,13 +114,13 @@ def test_godot_demo_verifier_rejects_artifact_tampering(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     engine = _fake_pass_engine(tmp_path)
-    monkeypatch.setattr("flashpatch.submission_demo.compile_project", lambda *args, **kwargs: engine)
+    monkeypatch.setattr("flashpatch.godot_proof.compile_project", lambda *args, **kwargs: engine)
     output = tmp_path / "public-demo"
-    run_submission_godot_demo(PROJECT, CONTRACT, output)
+    run_godot_proof(PROJECT, CONTRACT, output)
     (output / "patch.diff").write_text("tampered\n", encoding="utf-8")
 
-    with pytest.raises(SubmissionDemoError, match="artifact hash mismatch"):
-        verify_submission_godot_demo(output / "receipt.json")
+    with pytest.raises(GodotProofError, match="artifact hash mismatch"):
+        verify_godot_proof(output / "receipt.json")
 
 
 def test_godot_demo_preserves_fail_closed_engine_result(
@@ -128,7 +128,7 @@ def test_godot_demo_preserves_fail_closed_engine_result(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(
-        "flashpatch.submission_demo.compile_project",
+        "flashpatch.godot_proof.compile_project",
         lambda *args, **kwargs: {
             "verdict": "INCONCLUSIVE",
             "reason": "missing_renderer_timestamps",
@@ -136,26 +136,26 @@ def test_godot_demo_preserves_fail_closed_engine_result(
     )
     output = tmp_path / "inconclusive-demo"
 
-    receipt = run_submission_godot_demo(PROJECT, CONTRACT, output)
+    receipt = run_godot_proof(PROJECT, CONTRACT, output)
 
     assert receipt["verdict"] == "INCONCLUSIVE"
     assert receipt["reason"] == "missing_renderer_timestamps"
     assert set(receipt["artifacts"]) == {"engine-receipt.json"}
-    with pytest.raises(SubmissionDemoError, match="receipt is not PASS"):
-        verify_submission_godot_demo(output / "receipt.json")
+    with pytest.raises(GodotProofError, match="receipt is not PASS"):
+        verify_godot_proof(output / "receipt.json")
 
 
 def test_godot_demo_receipt_is_plain_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     engine = _fake_pass_engine(tmp_path)
-    monkeypatch.setattr("flashpatch.submission_demo.compile_project", lambda *args, **kwargs: engine)
+    monkeypatch.setattr("flashpatch.godot_proof.compile_project", lambda *args, **kwargs: engine)
     output = tmp_path / "public-demo"
-    run_submission_godot_demo(PROJECT, CONTRACT, output)
+    run_godot_proof(PROJECT, CONTRACT, output)
 
     assert json.loads((output / "receipt.json").read_text(encoding="utf-8"))["schema"].endswith("-v1")
 
 
 def test_checked_in_godot_demo_is_self_verifying_and_public_safe() -> None:
-    verification = verify_submission_godot_demo(GOLDEN_DEMO / "receipt.json")
+    verification = verify_godot_proof(GOLDEN_DEMO / "receipt.json")
     engine_receipt = (GOLDEN_DEMO / "engine-receipt.json").read_text(encoding="utf-8")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
 

@@ -12,7 +12,7 @@
       "source_bound_correction": true,
       "gameplay_state_preserved": true,
       "public_receipt": "godot-demo/receipt.json",
-      "public_receipt_file_sha256": "sha256:2e692fd4e8e236ade735c896c75cd2a725c0b0494beb0b59bef0d1cbd6c64674"
+      "public_receipt_file_sha256": "sha256:bd090a228d6729af91b5baf67d755c8e9fe6e1e7ecf89c08c29c374b03fd635a"
     },
     {
       "engine": "Unreal Engine",

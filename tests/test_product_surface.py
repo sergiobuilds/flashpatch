@@ -102,7 +102,7 @@ def test_safety_demo_writes_all_terminal_receipts(tmp_path: Path) -> None:
     assert json.loads((tmp_path / "inconclusive-receipt.json").read_text())["verdict"] == "INCONCLUSIVE"
 
 
-def test_browser_judge_flow_uploads_repairs_and_downloads(tmp_path: Path) -> None:
+def test_browser_flow_uploads_repairs_and_downloads(tmp_path: Path) -> None:
     source = tmp_path / "hazard.mp4"
     _hazard_video(source)
     server = create_server("127.0.0.1", 0, workspace=tmp_path / "web")

@@ -345,30 +345,30 @@ def main() -> None:
             else format_safety_demo(report)
         )
     elif args.command == "godot-demo":
-        from .submission_demo import (
-            SubmissionDemoError,
-            format_submission_godot_demo,
-            run_submission_godot_demo,
+        from .godot_proof import (
+            GodotProofError,
+            format_godot_proof,
+            run_godot_proof,
         )
 
         try:
-            receipt = run_submission_godot_demo(args.project, args.contract, args.output)
+            receipt = run_godot_proof(args.project, args.contract, args.output)
             print(
                 json.dumps(receipt, indent=2, sort_keys=True)
                 if args.json_output
-                else format_submission_godot_demo(receipt, args.output)
+                else format_godot_proof(receipt, args.output)
             )
             if receipt.get("verdict") != "PASS":
                 raise SystemExit(2)
-        except (OSError, KeyError, SubmissionDemoError) as exc:
+        except (OSError, KeyError, GodotProofError) as exc:
             print(json.dumps({"verdict": "INCONCLUSIVE", "reason": str(exc)}, sort_keys=True))
             raise SystemExit(2) from exc
     elif args.command == "verify-godot-demo":
-        from .submission_demo import SubmissionDemoError, verify_submission_godot_demo
+        from .godot_proof import GodotProofError, verify_godot_proof
 
         try:
-            print(json.dumps(verify_submission_godot_demo(args.receipt), indent=2, sort_keys=True))
-        except (OSError, json.JSONDecodeError, SubmissionDemoError) as exc:
+            print(json.dumps(verify_godot_proof(args.receipt), indent=2, sort_keys=True))
+        except (OSError, json.JSONDecodeError, GodotProofError) as exc:
             print(json.dumps({"verified": False, "verdict": "INCONCLUSIVE", "reason": str(exc)}, sort_keys=True))
             raise SystemExit(2) from exc
     elif args.command == "demo":

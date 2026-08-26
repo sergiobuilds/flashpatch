@@ -3,7 +3,7 @@
     "after.png": "sha256:0e3fb99df219c1ee95320f290d75db10eb2431b071b34570f1ea093117335a1f",
     "before.png": "sha256:823e0640cf2b3dd7add423e9e27b326d6fa880a788eb3ba19e8e33ef03c357a5",
     "comparison.png": "sha256:d91bbc63daa6040bb783f23157d47af7135f40648aa2c30c57e9c9199f907850",
-    "engine-receipt.json": "sha256:642d5f71e405dc29a1c3026d413694f00627593cb6fc66361b1da6f93ddf3eda",
+    "engine-receipt.json": "sha256:8713db7fcddf8ffdad27c95e768afc6b66267353dd18c1abdbf043b1661e803b",
     "patch.diff": "sha256:8db20cd29777a14ce703473d1a83bbb20f215f287ffb8fd5b7840176def37f94"
   },
   "engine": {
@@ -15,7 +15,7 @@
     },
     "version": "4.7.1.stable.official.a13da4feb"
   },
-  "engine_receipt_payload_sha256": "sha256:10a8fac731b4cd9a1c69afcdfd6046e9c6db93bae2dc517dc9fb8026eecbae2b",
+  "engine_receipt_payload_sha256": "sha256:408056f388a2ee5e970809327256e1d6c9edc4202309cd2b0c7a646b47a38453",
   "hazard": {
     "after": {
       "hazardous": false,
@@ -51,7 +51,7 @@
     "source_line": 3
   },
   "reason": "same_trace_counterfactual_removed_declared_risk",
-  "receipt_sha256": "sha256:90d61b76cb0262913146826dbd4b737d90291df03f4c9286d2ab311281f366f9",
+  "receipt_sha256": "sha256:afc61597d0bc882ae3d0ff67b09ea274d2754e2ff1387fbc2cb2e59b0cc22cef",
   "replay": {
     "gameplay_state_preserved": true,
     "gameplay_state_sha256": "sha256:dab0f4da463c112eb7212a488e32d510716cee686d1302d3c96e3f19ca430cd3",
@@ -60,7 +60,7 @@
     "timing_preserved": true,
     "trace_sha256": "sha256:71c9f3041d279b03f0c4b83d67b5d39b782ef308b98f3e43e96b31146e337b39"
   },
-  "schema": "flashpatch-godot-submission-demo-v1",
+  "schema": "flashpatch-godot-proof-v1",
   "source_isolation": {
     "original_unchanged": true,
     "patched_only_in_workspace_copy": true,

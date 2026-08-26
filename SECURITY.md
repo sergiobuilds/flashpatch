@@ -2,7 +2,7 @@
 
 ## 1 Supported version
 
-The latest commit on the default branch is the supported development version. Release tags identify immutable submission and distribution snapshots.
+The latest commit on the default branch is the supported development version. Release tags identify immutable release snapshots.
 
 ## 2 Reporting a vulnerability
 

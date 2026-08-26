@@ -65,7 +65,7 @@ def installed_cli(tmp_path_factory: pytest.TempPathFactory) -> tuple[Path, dict[
     return executable, environment, outside_checkout
 
 
-def test_installed_safety_demo_is_judge_readable_and_source_independent(
+def test_installed_safety_demo_is_user_readable_and_source_independent(
     installed_cli: tuple[Path, dict[str, str], Path],
 ) -> None:
     executable, environment, cwd = installed_cli
