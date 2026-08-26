@@ -254,6 +254,30 @@ def main() -> None:
     )
     safety_demo.add_argument("--output", type=Path, default=Path("artifacts/safety-demo"))
     safety_demo.add_argument("--json", action="store_true", dest="json_output")
+    godot_demo = subparsers.add_parser(
+        "godot-demo",
+        help="run the submission Godot project through render, patch, replay, and evidence export",
+    )
+    godot_demo.add_argument(
+        "--project",
+        type=Path,
+        default=Path("benchmarks/aigame-psebench/corpus/interaction-burst"),
+    )
+    godot_demo.add_argument(
+        "--contract",
+        type=Path,
+        default=Path(
+            "benchmarks/aigame-psebench/corpus/interaction-burst/"
+            "flashpatch.renderer.contract.json"
+        ),
+    )
+    godot_demo.add_argument("--output", type=Path, default=Path("artifacts/godot-demo"))
+    godot_demo.add_argument("--json", action="store_true", dest="json_output")
+    verify_godot_demo = subparsers.add_parser(
+        "verify-godot-demo",
+        help="verify the hashes and safety claims in a Godot demo receipt",
+    )
+    verify_godot_demo.add_argument("receipt", type=Path)
     demo = subparsers.add_parser("demo", help="run the deterministic proof clip")
     demo.add_argument("--output", type=Path, default=Path("artifacts/demo"))
     scan = subparsers.add_parser("scan", help="scan an MP4 file for flash hazards")
@@ -320,6 +344,33 @@ def main() -> None:
             if args.json_output
             else format_safety_demo(report)
         )
+    elif args.command == "godot-demo":
+        from .submission_demo import (
+            SubmissionDemoError,
+            format_submission_godot_demo,
+            run_submission_godot_demo,
+        )
+
+        try:
+            receipt = run_submission_godot_demo(args.project, args.contract, args.output)
+            print(
+                json.dumps(receipt, indent=2, sort_keys=True)
+                if args.json_output
+                else format_submission_godot_demo(receipt, args.output)
+            )
+            if receipt.get("verdict") != "PASS":
+                raise SystemExit(2)
+        except (OSError, KeyError, SubmissionDemoError) as exc:
+            print(json.dumps({"verdict": "INCONCLUSIVE", "reason": str(exc)}, sort_keys=True))
+            raise SystemExit(2) from exc
+    elif args.command == "verify-godot-demo":
+        from .submission_demo import SubmissionDemoError, verify_submission_godot_demo
+
+        try:
+            print(json.dumps(verify_submission_godot_demo(args.receipt), indent=2, sort_keys=True))
+        except (OSError, json.JSONDecodeError, SubmissionDemoError) as exc:
+            print(json.dumps({"verified": False, "verdict": "INCONCLUSIVE", "reason": str(exc)}, sort_keys=True))
+            raise SystemExit(2) from exc
     elif args.command == "demo":
         receipt = _run_demo(args.output)
         print(json.dumps(receipt, indent=2, sort_keys=True))

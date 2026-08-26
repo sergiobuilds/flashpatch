@@ -1172,10 +1172,16 @@ def compile_project(
             )
         ]
         if invalid_preservation:
-            receipt.update({"verdict": "INCONCLUSIVE", "reason": "hazard_removed_but_gameplay_preservation_failed"})
+            receipt.update({"verdict": "FAIL", "reason": "patch_broke_declared_gameplay_invariants"})
             return receipt
         if not successful:
-            receipt.update({"verdict": "FAIL", "reason": "hazard_persists_after_all_declared_candidates"})
+            if len(sealed.candidates) > 1:
+                receipt.update({
+                    "verdict": "INCONCLUSIVE",
+                    "reason": "multiple_parameters_required_no_single_patch_authorized",
+                })
+            else:
+                receipt.update({"verdict": "FAIL", "reason": "hazard_persists_after_all_declared_candidates"})
             return receipt
         successful.sort(
             key=lambda item: (
