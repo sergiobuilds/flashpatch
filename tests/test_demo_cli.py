@@ -108,6 +108,38 @@ def test_installed_safety_demo_is_judge_readable_and_source_independent(
         "pass": "PASS",
         "safe": "SAFE",
     }
+    reversals = report["failure_reversals"]
+    assert reversals["schema"] == "flashpatch-failure-reversal-matrix-v1"
+    assert {
+        name: (case["expected_verdict"], case["actual_verdict"], case["reason"])
+        for name, case in reversals["cases"].items()
+    } == {
+        "already_safe": ("SAFE", "SAFE", "no_hazard_in_declared_trace"),
+        "gameplay_state_drift": (
+            "FAIL",
+            "FAIL",
+            "patch_broke_declared_gameplay_invariants",
+        ),
+        "missing_renderer_timestamps": (
+            "INCONCLUSIVE",
+            "INCONCLUSIVE",
+            "frame artifact must contain valid frames and timestamps: "
+            "renderer artifact must contain only frames.npy and timestamps.npy",
+        ),
+        "multiple_parameters_required": (
+            "INCONCLUSIVE",
+            "INCONCLUSIVE",
+            "multiple_parameters_required_no_single_patch_authorized",
+        ),
+        "residual_risk": (
+            "FAIL",
+            "FAIL",
+            "hazard_persists_after_all_declared_candidates",
+        ),
+    }
+    assert json.loads((output / "failure-matrix.json").read_text(encoding="utf-8")) == reversals
+    for name in ("gameplay-drift", "missing-timestamps", "multi-parameter"):
+        assert (output / f"{name}-receipt.json").is_file()
     for verdict in ("pass", "safe", "fail", "inconclusive"):
         receipt = json.loads((output / f"{verdict}-receipt.json").read_text(encoding="utf-8"))
         assert receipt["verdict"] == report["results"][verdict]

@@ -6,6 +6,7 @@
 
 | Actual Godot 4.7.1 run | Result |
 |---|---:|
+| Hazard verdict | **FAIL → PASS** |
 | Risk before → after | **5.0 → 0.0** |
 | Source edit | `main.gd:3`, `burst_intensity 1.0 → 0.0` |
 | Source assignments changed | **1** |
@@ -47,6 +48,8 @@ The tools below solve related but different parts of visual accessibility QA. A 
 | [TooFlashy](https://github.com/hashb/TooFlashy) / [EPI-LENS](https://github.com/Pi-0r-Tau/EPI-LENS) | Video detection and reporting | ✓ | — | — | — | — | — |
 | [FFmpeg photosensitivity filter](https://ffmpeg.org/ffmpeg-filters.html#photosensitivity) | Video filtering | ✓ | Video | — | — | — | — |
 | [Kaya PSE detection/correction](https://github.com/samfatu/pse-detection-correction) | Video detection and correction | ✓ | Video | — | — | — | — |
+| [Apple VideoFlashingReduction](https://github.com/apple/VideoFlashingReduction) | Playback-time flashing reduction | ✓ | Displayed video | — | — | — | — |
+| [Unflash](https://github.com/Kelardry/unflash-video) | Video detection, correction, and recheck | ✓ | Video | — | — | — | Video record |
 
 Ubisoft Chroma is an important accessibility tool, but it targets color-vision simulation rather than photosensitive-seizure risk. The direct difference is the workflow endpoint: Chroma helps a developer see a visual accessibility issue; FlashPatch's Godot path tests a source-level correction and proves the same gameplay still completes.
 
@@ -74,7 +77,7 @@ For a fast engine-free tour of all four terminal states:
 flashpatch safety-demo --output artifacts/safety-demo
 ```
 
-`safety-demo` is a deterministic contract fixture for learning the verdict flow. It is not renderer evidence. The checked-in images and Godot receipt above come from actual rendered frames.
+`safety-demo` is a deterministic contract fixture for learning the verdict flow. It also writes `failure-matrix.json` and separate receipts for residual risk, gameplay-state drift, multi-parameter causality, missing renderer timestamps, and an already-safe scene. It is not renderer evidence. The checked-in images and Godot receipt above come from actual rendered frames.
 
 ## 4 Verdicts
 
@@ -86,6 +89,14 @@ flashpatch safety-demo --output artifacts/safety-demo
 | `INCONCLUSIVE` | Required evidence was missing, malformed, ambiguous, or would require an unauthorized multi-parameter edit. |
 
 Fail-closed behavior is deliberate. Missing frames or timestamps, ambiguous source binding, and multi-parameter causality never become a guessed `PASS`.
+
+| Reversal fixture | Required result |
+|---|---|
+| Risk remains after the allowed edit | `FAIL` |
+| Risk disappears but gameplay state changes | `FAIL` |
+| Two parameters are required | `INCONCLUSIVE` |
+| Renderer timestamps are missing | `INCONCLUSIVE` |
+| Scene starts below threshold | `SAFE` |
 
 ## 5 How it works
 
@@ -143,6 +154,7 @@ The checked-in direct-baseline result uses three sealed cases and keeps detectio
 | Detection accuracy | 3/3 | EA IRIS 3/3; EPI-LENS 1/3 | Three sealed video cases |
 | Residual hazard after repair | 0% | FFmpeg 0% | Same three cases |
 | Fraction of pixels changed | **25.00%** | FFmpeg 45.83% | Same three cases |
+| Pixels changed outside the gold hazard region | 0% | FFmpeg 0% | Same three cases |
 | Mean structural similarity | **0.7871** | FFmpeg 0.6523 | Same three cases |
 
 Raw case-level values, fixed comparator revisions, input manifest hash, and reproduction metadata are in [`benchmarks/direct-baseline/results.json`](benchmarks/direct-baseline/results.json). Three cases are useful regression evidence, not a universal accuracy ranking.
