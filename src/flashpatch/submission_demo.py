@@ -80,6 +80,21 @@ def _comparison(before: np.ndarray, after: np.ndarray) -> np.ndarray:
     return canvas
 
 
+def _minimal_single_line_diff(diff: str, source: str, source_line: int) -> str:
+    deleted = [line for line in diff.splitlines() if line.startswith("-") and not line.startswith("---")]
+    added = [line for line in diff.splitlines() if line.startswith("+") and not line.startswith("+++")]
+    if len(deleted) != 1 or len(added) != 1:
+        raise SubmissionDemoError("submission demo patch must contain exactly one changed source line")
+    return "\n".join([
+        f"--- a/{source}",
+        f"+++ b/{source}",
+        f"@@ -{source_line} +{source_line} @@",
+        deleted[0],
+        added[0],
+        "",
+    ])
+
+
 def run_submission_godot_demo(
     project: Path | str,
     contract_path: Path | str,
@@ -140,7 +155,18 @@ def run_submission_godot_demo(
     _write_rgb(after_path, candidate_frames[frame_index])
     _write_rgb(comparison_path, _comparison(factual_frames[frame_index], candidate_frames[frame_index]))
     original_diff = Path(str(attribution["diff"]))
-    diff_path.write_text(original_diff.read_text(encoding="utf-8"), encoding="utf-8")
+    source_line = attribution.get("source_line")
+    if not isinstance(source_line, int) or source_line < 1:
+        raise SubmissionDemoError("PASS engine receipt omitted a valid source line")
+    source_relative = declared.source.relative_to(project_path).as_posix()
+    diff_path.write_text(
+        _minimal_single_line_diff(
+            original_diff.read_text(encoding="utf-8"),
+            source_relative,
+            source_line,
+        ),
+        encoding="utf-8",
+    )
 
     factual_capture = factual.get("renderer_capture")
     candidate_capture = attribution.get("renderer_capture")
@@ -183,8 +209,8 @@ def run_submission_godot_demo(
             "comparison_frame_index": frame_index,
         },
         "patch": {
-            "source": declared.source.relative_to(project_path).as_posix(),
-            "source_line": attribution.get("source_line"),
+            "source": source_relative,
+            "source_line": source_line,
             "node": attribution.get("node"),
             "parameter": attribution.get("parameter"),
             "original_value": runtime.get("factual_value"),

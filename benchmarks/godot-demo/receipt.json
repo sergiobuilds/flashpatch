@@ -1,0 +1,71 @@
+{
+  "artifacts": {
+    "after.png": "sha256:0e3fb99df219c1ee95320f290d75db10eb2431b071b34570f1ea093117335a1f",
+    "before.png": "sha256:823e0640cf2b3dd7add423e9e27b326d6fa880a788eb3ba19e8e33ef03c357a5",
+    "comparison.png": "sha256:d91bbc63daa6040bb783f23157d47af7135f40648aa2c30c57e9c9199f907850",
+    "engine-receipt.json": "sha256:642d5f71e405dc29a1c3026d413694f00627593cb6fc66361b1da6f93ddf3eda",
+    "patch.diff": "sha256:8db20cd29777a14ce703473d1a83bbb20f215f287ffb8fd5b7840176def37f94"
+  },
+  "engine": {
+    "actual_renderer_frames": true,
+    "name": "Godot",
+    "renderer_configuration": {
+      "display_driver": "x11",
+      "rendering_driver": "opengl3"
+    },
+    "version": "4.7.1.stable.official.a13da4feb"
+  },
+  "engine_receipt_payload_sha256": "sha256:10a8fac731b4cd9a1c69afcdfd6046e9c6db93bae2dc517dc9fb8026eecbae2b",
+  "hazard": {
+    "after": {
+      "hazardous": false,
+      "kinds": [],
+      "max_risk": 0.0
+    },
+    "before": {
+      "hazardous": true,
+      "kinds": [
+        "general_flash"
+      ],
+      "max_risk": 5.0
+    },
+    "comparison_frame_index": 2,
+    "threshold": 1.0
+  },
+  "input": {
+    "contract": "flashpatch.renderer.contract.json",
+    "project": "interaction-burst",
+    "project_file_sha256": "sha256:33c71b25d9ad0193c55e9e236d7fe1a052a32b5a0bf7d7cb15bd675c1cad27c4",
+    "source_snapshot_sha256": "sha256:8990b5749260cfc622085c8509cec200742e65c6cd87333947c2b282642dcb0a",
+    "trace_sha256": "sha256:71c9f3041d279b03f0c4b83d67b5d39b782ef308b98f3e43e96b31146e337b39"
+  },
+  "patch": {
+    "causal_contribution": 5.0,
+    "changed_source_assignments": 1,
+    "diff": "patch.diff",
+    "node": "/root/InteractionBurst",
+    "original_value": 1.0,
+    "parameter": "burst_intensity",
+    "replacement": 0.0,
+    "source": "main.gd",
+    "source_line": 3
+  },
+  "reason": "same_trace_counterfactual_removed_declared_risk",
+  "receipt_sha256": "sha256:90d61b76cb0262913146826dbd4b737d90291df03f4c9286d2ab311281f366f9",
+  "replay": {
+    "gameplay_state_preserved": true,
+    "gameplay_state_sha256": "sha256:dab0f4da463c112eb7212a488e32d510716cee686d1302d3c96e3f19ca430cd3",
+    "same_trace": true,
+    "semantic_invariants_preserved": true,
+    "timing_preserved": true,
+    "trace_sha256": "sha256:71c9f3041d279b03f0c4b83d67b5d39b782ef308b98f3e43e96b31146e337b39"
+  },
+  "schema": "flashpatch-godot-submission-demo-v1",
+  "source_isolation": {
+    "original_unchanged": true,
+    "patched_only_in_workspace_copy": true,
+    "source_sha256_after": "sha256:03eb4bd553682fb33775b46b6f84cc5a581242ace49ac8642b7865253912d655",
+    "source_sha256_before": "sha256:03eb4bd553682fb33775b46b6f84cc5a581242ace49ac8642b7865253912d655"
+  },
+  "verdict": "PASS"
+}

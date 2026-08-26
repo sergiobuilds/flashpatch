@@ -1,0 +1,39 @@
+name: Bug report
+description: Report a reproducible FlashPatch defect
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Observed outcome
+      description: Include the verdict and reason, but remove private paths and secrets.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Provide the smallest safe fixture and exact command.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected outcome
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python version, FlashPatch commit, and Godot version when applicable.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I have labeled any hazardous flashing media and disabled autoplay.
+          required: true

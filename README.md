@@ -1,43 +1,58 @@
 # FlashPatch
 
-**Fail-closed visual QA for game development.** FlashPatch finds photosensitive-seizure risk and other time-based visual defects in a game before release, and proves each verdict with a hash-bound receipt.
+**FlashPatch finds a dangerous flash in a running Godot scene, traces it to one source parameter, tests an allowed edit, and replays the same input before it reports `PASS`.**
 
-Contents: [한국어 요약](#1-한국어-요약) · [Problem](#2-the-problem) · [Quickstart](#3-anonymous-clone-and-30-second-demo) · [Verdicts](#4-what-a-verdict-means) · [Replay contract](#6-the-replay-contract) · [Engine scope](#7-engine-scope) · [Development](#9-development-and-public-release-checks) · [License and SBOM](#10-license-and-sbom)
+![Actual Godot renderer capture before and after the verified patch](benchmarks/godot-demo/comparison.png)
+
+| Actual Godot 4.7.1 run | Result |
+|---|---:|
+| Risk before → after | **5.0 → 0.0** |
+| Source edit | `main.gd:3`, `burst_intensity 1.0 → 0.0` |
+| Source assignments changed | **1** |
+| Same action trace | **Yes** |
+| Timing, gameplay state, semantic invariants preserved | **Yes** |
+| Original project modified | **No** |
+
+Inspect the [patch](benchmarks/godot-demo/patch.diff), [public receipt](benchmarks/godot-demo/receipt.json), or verify every artifact hash locally:
+
+```bash
+flashpatch verify-godot-demo benchmarks/godot-demo/receipt.json
+```
+
+Contents: [한국어 요약](#1-한국어-요약) · [Product comparison](#2-product-comparison) · [Run the Godot proof](#3-run-the-godot-proof) · [Verdicts](#4-verdicts) · [How it works](#5-how-it-works) · [Evidence](#6-measured-evidence) · [Scope](#7-engine-scope-and-limitations) · [Development](#9-development-and-release-checks)
 
 ## 1 한국어 요약
 
-게임의 번쩍임은 출시 후에 발견하면 늦습니다. 스토어 심사, 등급 분류, 접근성 요구를 다시 통과해야 하고, 무엇보다 실제 이용자에게 발작을 유발할 수 있습니다.
+기존 번쩍임 검사 도구는 대개 위험한 영상 구간을 알려 주는 데서 끝납니다. 개발자는 다시 게임으로 돌아가 원인 코드를 찾고, 값을 고친 뒤, 그 수정이 플레이를 망가뜨리지 않았는지 별도로 확인해야 합니다.
 
-FlashPatch는 출시 전 최종 화면에서 그 위험을 찾아내고, **찾았다는 사실을 재현 가능한 증거로 남깁니다.** 프레임을 눈으로 보고 판단하는 것이 아니라, 선언된 조작 기록을 그대로 재생해 렌더러가 실제로 그린 픽셀을 캡처하고, 위험 구간을 소스 코드의 한 줄·한 파라미터까지 연결합니다.
+FlashPatch의 검증된 Godot 경로는 이 과정을 하나로 묶습니다.
 
-핵심은 **모르는 것을 모른다고 말하는 것**입니다. 렌더러 증거가 없거나, 타임스탬프가 깨졌거나, 원인이 여러 파라미터에 걸쳐 있으면 추측하지 않고 `INCONCLUSIVE`로 닫습니다. 통과·안전·실패·판정불가 네 가지 결론만 존재하며, 각각이 입력 바이트 해시와 함께 영수증으로 남습니다.
+1. 선언된 조작을 실제 Godot 장면에서 재생하고 렌더러가 그린 RGB 프레임을 검사합니다.
+2. 위험 순간의 런타임 노드·속성·스크립트·소스 줄을 연결합니다.
+3. 프로젝트가 미리 허용한 소스 변수 하나만 격리된 복사본에서 바꿉니다.
+4. 같은 조작을 다시 재생해 위험 제거와 게임 상태 보존을 함께 확인합니다.
+5. 입력, 수정, 결과물의 해시가 결박된 영수증을 남깁니다.
 
-익명 clone과 비편집 설치 상태에서 30초 데모를 직접 확인할 수 있습니다. 이 데모에는 Godot, GPU, 디스플레이가 필요하지 않습니다.
+따라서 FlashPatch가 더 나은 지점은 단순히 “번쩍임을 더 잘 찾는다”가 아닙니다. **화면의 문제를 실제 게임 소스 수정과 동일 플레이 회귀 검증까지 끝내는 범위**가 더 넓습니다. 증거가 없거나 원인이 여러 값에 걸치면 추측하지 않습니다.
 
-```bash
-git clone https://github.com/sergiobuilds/flashpatch-public.git
-cd flashpatch-public
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install .
-flashpatch safety-demo
-```
+## 2 Product comparison
 
-`safety-demo`는 설치된 패키지만으로 `PASS`, `SAFE`, `FAIL`, `INCONCLUSIVE` 네 결론을 생성합니다. 이 deterministic contract fixture는 제품 흐름을 설명하는 데모이며 renderer evidence는 아닙니다.
+The tools below solve related but different parts of visual accessibility QA. A check means the capability is present in the tool's public product path; a dash means it is not the stated public workflow. This is a capability comparison, not a claim that FlashPatch has the best detector.
 
-판정 기준은 임의로 정하지 않았습니다. WCAG 2.2의 일반 번쩍임 임계값과 ITU-R BT.1702 권고를 원문 출처와 함께 [`docs/research/`](docs/research/)에 고정해 두었고, 각 주장의 상태는 [`claims.json`](docs/research/claims.json)에서 확인하실 수 있습니다.
+| Tool | Primary job | Detect flashing | Modify output | Link rendered event to game source | Replay same game input | Check gameplay state | Hash-bound verdict |
+|---|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **FlashPatch** | **Godot source repair with replay validation** | ✓ | **One allowed source parameter** | **✓** | **✓** | **✓** | **✓** |
+| [Ubisoft Chroma](https://github.com/ubisoft/Chroma) | Real-time color-blindness simulation | Different target | — | — | — | — | — |
+| [EA IRIS](https://github.com/electronicarts/IRIS) | Photosensitivity analysis of video | ✓ | — | — | — | — | — |
+| [TooFlashy](https://github.com/hashb/TooFlashy) / [EPI-LENS](https://github.com/Pi-0r-Tau/EPI-LENS) | Video detection and reporting | ✓ | — | — | — | — | — |
+| [FFmpeg photosensitivity filter](https://ffmpeg.org/ffmpeg-filters.html#photosensitivity) | Video filtering | ✓ | Video | — | — | — | — |
+| [Kaya PSE detection/correction](https://github.com/samfatu/pse-detection-correction) | Video detection and correction | ✓ | Video | — | — | — | — |
 
----
+Ubisoft Chroma is an important accessibility tool, but it targets color-vision simulation rather than photosensitive-seizure risk. The direct difference is the workflow endpoint: Chroma helps a developer see a visual accessibility issue; FlashPatch's Godot path tests a source-level correction and proves the same gameplay still completes.
 
-## 2 The problem
+## 3 Run the Godot proof
 
-A single unlucky flash sequence can trigger a seizure. Studios usually catch this at the very end, by eye, on someone's monitor — after the build is locked. When it is caught, the next question has no good answer: *which line of our code caused it, and did fixing it break the game?*
-
-FlashPatch answers both, and refuses to guess when it cannot.
-
-## 3 Anonymous clone and 30-second demo
-
-Python 3.11 or later. No engine, no GPU, no display required.
+Requirements: Python 3.11 or later and Godot 4. On headless Linux, `xvfb-run` provides the display used by the real renderer.
 
 ```bash
 git clone https://github.com/sergiobuilds/flashpatch-public.git
@@ -45,49 +60,57 @@ cd flashpatch-public
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install .
-flashpatch safety-demo --json --output artifacts/safety-demo
+
+export GODOT_BINARY=/path/to/godot
+xvfb-run -a flashpatch godot-demo
+flashpatch verify-godot-demo artifacts/godot-demo/receipt.json
 ```
 
-`safety-demo` runs one deterministic contract fixture through localization, an allowlisted one-parameter patch, and same-trace revalidation. It writes a report and one hash-bound receipt for each terminal state.
+On a desktop session, run `flashpatch godot-demo` without `xvfb-run`. The command uses the included `interaction-burst` Godot project and performs the full render → localize → patch → replay → verify loop. It writes `before.png`, `after.png`, `comparison.png`, `patch.diff`, the detailed engine receipt, and the independently checkable public receipt.
 
-```json
-{
-  "results": {
-    "fail": "FAIL",
-    "inconclusive": "INCONCLUSIVE",
-    "pass": "PASS",
-    "safe": "SAFE"
-  },
-  "schema": "flashpatch-safety-demo-v2"
-}
+For a fast engine-free tour of all four terminal states:
+
+```bash
+flashpatch safety-demo --output artifacts/safety-demo
 ```
 
-The source-bound Godot path is separate from this installed demonstration and uses the replay contract below.
+`safety-demo` is a deterministic contract fixture for learning the verdict flow. It is not renderer evidence. The checked-in images and Godot receipt above come from actual rendered frames.
 
-## 4 What a verdict means
+## 4 Verdicts
 
 | Receipt | Meaning |
 |---|---|
-| `PASS` | A candidate one-parameter edit lowered the risk and preserved the declared gameplay invariants. |
-| `SAFE` | The project was already below the risk threshold under its declared trace. |
-| `FAIL` | Risk remained, or the edit broke a declared invariant. |
-| `INCONCLUSIVE` | The evidence required for a verdict was missing or ambiguous. |
+| `PASS` | One declared source edit removed the measured risk and preserved timing, gameplay state, and semantic invariants. |
+| `SAFE` | The actual replay was already below the declared threshold. |
+| `FAIL` | Risk remained after every allowed single edit, or an edit removed risk but broke a declared gameplay invariant. |
+| `INCONCLUSIVE` | Required evidence was missing, malformed, ambiguous, or would require an unauthorized multi-parameter edit. |
 
-`INCONCLUSIVE` is a feature. Missing renderer evidence, malformed timestamps, ambiguous source binding, multi-parameter edits, and gameplay drift all close as `INCONCLUSIVE` rather than as a guess. A headless numeric signal is a smoke regression and never stands in for pixel evidence.
+Fail-closed behavior is deliberate. Missing frames or timestamps, ambiguous source binding, and multi-parameter causality never become a guessed `PASS`.
 
-## 5 How a verdict is produced
+## 5 How it works
 
-1. Replay a declared action trace in an isolated copy of the project.
-2. Capture renderer-owned RGB frames when the project supplies a non-headless replay adapter.
-3. Detect visual-risk intervals and bind them to timestamped runtime node, property, script, and source-line evidence.
-4. Test exactly one allowlisted exported source parameter edit at a time.
-5. Accept the patch only when the copied project lowers risk *and* preserves the declared gameplay invariants.
+```text
+action trace + Godot project
+            │
+            ▼
+  isolated factual replay ──► renderer RGB frames ──► hazard interval
+            │                                           │
+            │                                           ▼
+            └──────── runtime event ──► node / property / script / line
+                                                        │
+                                                        ▼
+                                      one allowlisted source edit
+                                                        │
+                                                        ▼
+                                        same-trace counterfactual replay
+                                                        │
+                                                        ▼
+                                  risk removed + game preserved + receipt
+```
 
-Every step hashes what it read and what it produced, so a receipt can be re-verified later against the same bytes.
+The original project is hashed before and after the run. Edits occur only inside a temporary sealed copy. A candidate is accepted only if the detector passes on renderer-owned pixels and the declared replay invariants match the factual run.
 
-## 6 The replay contract
-
-`flashpatch compile` accepts `flashpatch-godot-safety-ci-v1`. A project declares its trace, scene, gameplay preservation fields, and the one-parameter patch candidates FlashPatch is permitted to test.
+The contract is explicit about what FlashPatch may change:
 
 ```json
 {
@@ -96,52 +119,62 @@ Every step hashes what it read and what it produced, so a receipt can be re-veri
   "scene": "main.tscn",
   "timing_field": "action_frames",
   "state_field": "gameplay_state",
-  "risk_signal": {"kind": "replay_observations_v1", "field": "observations", "threshold": 1.0},
+  "risk_signal": {"kind": "frame_npz_v1", "field": "frames_npz", "threshold": 1.0},
   "patch_candidates": [
     {"source": "main.gd", "parameter": "burst_intensity", "replacement": 0.0}
   ]
 }
 ```
 
-Working examples live in [`benchmarks/aigame-psebench/corpus/`](benchmarks/aigame-psebench/corpus/) — two small Godot projects, one with an interaction-triggered burst and one with a periodic pulse, each with its trace, contract, and ground truth.
+Two redistributable Godot fixtures, traces, contracts, and ground truth live in [`benchmarks/aigame-psebench/corpus/`](benchmarks/aigame-psebench/corpus/).
 
-```bash
-export GODOT_BINARY=/path/to/Godot
-flashpatch compile <project> <contract-or-trace> \
-  --workspace artifacts/flashpatch-ci \
-  --receipt artifacts/flashpatch-ci/receipt.json
-```
+## 6 Measured evidence
 
-A renderer-backed adapter declares `frame_npz_v1` and emits uint8 RGB frames with strictly increasing timestamps. FlashPatch hashes that artifact before analysis.
+### 6.1 Source-bound Godot result
 
-## 7 Engine scope
+The hero result is a real X11/OpenGL Godot 4.7.1 capture of 12 frames. FlashPatch localized `/root/InteractionBurst` to `main.gd:3`, changed one declared assignment in the workspace copy, reduced maximum measured risk from 5.0 to 0.0, and preserved the same trace, timing, gameplay state, and semantic invariants. The [engine receipt](benchmarks/godot-demo/engine-receipt.json) retains the detailed run evidence.
 
-The verified source-bound path is Godot. A Unity source preflight binds manifest-declared project files before any editor import:
+### 6.2 Same-input video baselines
+
+The checked-in direct-baseline result uses three sealed cases and keeps detection and repair comparisons separate.
+
+| Measurement | FlashPatch | Comparator | Scope |
+|---|---:|---:|---|
+| Detection accuracy | 3/3 | EA IRIS 3/3; EPI-LENS 1/3 | Three sealed video cases |
+| Residual hazard after repair | 0% | FFmpeg 0% | Same three cases |
+| Fraction of pixels changed | **25.00%** | FFmpeg 45.83% | Same three cases |
+| Mean structural similarity | **0.7871** | FFmpeg 0.6523 | Same three cases |
+
+Raw case-level values, fixed comparator revisions, input manifest hash, and reproduction metadata are in [`benchmarks/direct-baseline/results.json`](benchmarks/direct-baseline/results.json). Three cases are useful regression evidence, not a universal accuracy ranking.
+
+## 7 Engine scope and limitations
+
+The verified source-bound path is Godot. FlashPatch does not claim production Unity or Unreal repair support.
+
+The Unity command is source preflight only. It binds manifest-declared files before editor import; it does not build, render, or repair a Unity project.
 
 ```bash
 flashpatch unity-preflight unity-source-manifest.json /path/to/UnityProject
 ```
 
-It checks manifest-bound source bytes only — it does not import Unity, build a player, or capture frames.
-
-An externally produced capture can be analyzed on its own, without any engine or source claim:
+External renderer captures can be analyzed without claiming engine identity or source causality:
 
 ```bash
 flashpatch renderer-intake capture.npz --receipt artifacts/capture-intake.json
 ```
 
-That receipt records the supplied frames, timestamps, and detector result. Engine identity, source causality, replay preservation, and repair effectiveness each require their own bound evidence.
+The current detector is standards-oriented engineering evidence, not a clinical certification. Detection quality is not claimed to exceed every specialist detector. The product advantage demonstrated here is the source-bound repair and same-game replay contract.
 
-## 8 Thresholds and sources
+## 8 Standards and research record
 
-Detection thresholds are pinned to primary standards rather than chosen by hand:
+Thresholds are pinned to primary standards and tracked with claim status:
 
-- [`docs/research/2026-WCAG22-THRESHOLDS.md`](docs/research/2026-WCAG22-THRESHOLDS.md) — general flash threshold, area fraction, window boundary
-- [`docs/research/sources.json`](docs/research/sources.json) — every primary source with its retrieval metadata and hash
-- [`docs/research/claims.json`](docs/research/claims.json) — each claim, its evidence, and the gaps that remain open
-- [`docs/research/standards-boundary-vectors.json`](docs/research/standards-boundary-vectors.json) — boundary vectors the detector is tested against
+- [`docs/research/2026-WCAG22-THRESHOLDS.md`](docs/research/2026-WCAG22-THRESHOLDS.md) documents the general-flash threshold, area fraction, and time-window boundary.
+- [`docs/research/sources.json`](docs/research/sources.json) records primary sources, retrieval metadata, and hashes.
+- [`docs/research/claims.json`](docs/research/claims.json) separates confirmed claims from open gaps.
+- [`docs/research/standards-boundary-vectors.json`](docs/research/standards-boundary-vectors.json) contains detector boundary vectors.
 
-## 9 Development and public release checks
+## 9 Development and release checks
 
 ```bash
 python -m pip install -e ".[dev]"
@@ -149,15 +182,16 @@ python -m pytest -q
 python scripts/check_public_release.py
 ```
 
-A clean anonymous clone completes the public test suite without failures. Tests bound to non-public evaluation inputs, runner scripts, release bundles, or the project map are explicitly skipped by [`tests/conftest.py`](tests/conftest.py). Missing public files are not part of that allowlist and remain failures.
+CI runs the portable regression subset on Python 3.11 and 3.12 across Linux, Windows, and macOS, plus the complete public suite on Linux. Package tests build a wheel, install it outside the checkout, and exercise the installed CLI. The release checker validates the tracked public boundary and the CycloneDX source SBOM.
 
-CI runs the portable regression subset on Python 3.11 and 3.12 across Linux, Windows, and macOS. That subset invokes the public-release checker for the SBOM and tracked source boundary. A second job runs the complete public suite. The package tests build a wheel, install it outside the checkout, and run the four-state demo from the installed package.
+Security reports follow [`SECURITY.md`](SECURITY.md). Contribution setup and review expectations are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
-## 10 License and SBOM
+## 10 License and supply chain
 
-[Apache License 2.0](LICENSE). Third-party attribution is recorded in [NOTICE](NOTICE). The checked-in CycloneDX 1.5 source SBOM is [`sbom/flashpatch.cdx.json`](sbom/flashpatch.cdx.json); CI verifies that its direct components match `pyproject.toml`.
+FlashPatch is licensed under [Apache License 2.0](LICENSE). Third-party attribution is in [NOTICE](NOTICE). The checked-in CycloneDX 1.5 source SBOM is [`sbom/flashpatch.cdx.json`](sbom/flashpatch.cdx.json).
 
 ## 11 Change history
 
-- 2026-08-25: synchronized the source package with the final candidate, added the four-state installed demo, and hardened the public boundary against private paths and a missing SBOM.
-- 2026-08-24: documented anonymous non-editable installation, separated the engine-free and Godot-backed demos, and added public-boundary and SBOM verification.
+- 2026-08-26: added the one-command actual-Godot proof, independently verifiable image and receipt bundle, fail-closed reversal tests, capability comparison, and measured evidence table.
+- 2026-08-25: synchronized the public source package, added the installed four-state fixture, and hardened private-path and SBOM checks.
+- 2026-08-24: documented anonymous installation and separated engine-free demonstration from renderer evidence.

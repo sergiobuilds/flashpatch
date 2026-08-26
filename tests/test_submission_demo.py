@@ -17,6 +17,7 @@ from flashpatch.submission_demo import (
 ROOT = Path(__file__).parents[1]
 PROJECT = ROOT / "benchmarks" / "aigame-psebench" / "corpus" / "interaction-burst"
 CONTRACT = PROJECT / "flashpatch.renderer.contract.json"
+GOLDEN_DEMO = ROOT / "benchmarks" / "godot-demo"
 
 
 def _fake_pass_engine(tmp_path: Path) -> dict[str, object]:
@@ -151,3 +152,17 @@ def test_godot_demo_receipt_is_plain_json(tmp_path: Path, monkeypatch: pytest.Mo
     run_submission_godot_demo(PROJECT, CONTRACT, output)
 
     assert json.loads((output / "receipt.json").read_text(encoding="utf-8"))["schema"].endswith("-v1")
+
+
+def test_checked_in_godot_demo_is_self_verifying_and_public_safe() -> None:
+    verification = verify_submission_godot_demo(GOLDEN_DEMO / "receipt.json")
+    engine_receipt = (GOLDEN_DEMO / "engine-receipt.json").read_text(encoding="utf-8")
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert verification["verified"] is True
+    assert verification["hazard_before"] == 5.0
+    assert verification["hazard_after"] == 0.0
+    assert "/home/" not in engine_receipt
+    assert "benchmarks/godot-demo/comparison.png" in readme
+    assert "flashpatch verify-godot-demo benchmarks/godot-demo/receipt.json" in readme
+    assert "3/3" in readme

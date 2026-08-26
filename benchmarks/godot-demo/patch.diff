@@ -1,0 +1,5 @@
+--- a/main.gd
++++ b/main.gd
+@@ -3 +3 @@
+-@export var burst_intensity: float = 1.0
++@export var burst_intensity: float = 0.0
