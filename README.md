@@ -202,7 +202,7 @@ Security reports follow [`SECURITY.md`](SECURITY.md). Contribution setup and rev
 
 FlashPatch is licensed under [Apache License 2.0](LICENSE). Third-party attribution is in [NOTICE](NOTICE). The checked-in CycloneDX 1.5 source SBOM is [`sbom/flashpatch.cdx.json`](sbom/flashpatch.cdx.json).
 
-## 12 Change history
+## 11 Change history
 
 - 2026-08-26: added the one-command actual-Godot proof, independently verifiable image and receipt bundle, fail-closed reversal tests, capability comparison, and measured evidence table.
 - 2026-08-25: synchronized the public source package, added the installed four-state fixture, and hardened private-path and SBOM checks.
