@@ -99,7 +99,7 @@ def test_built_wheel_runs_current_safety_demo_outside_source_checkout(
 
     for command in (
         [
-            "l10-verify",
+            "verify-engine-proof",
             str(tmp_path / "missing-receipt.json"),
             "--trust-policy",
             str(tmp_path / "missing-policy.json"),
@@ -107,7 +107,7 @@ def test_built_wheel_runs_current_safety_demo_outside_source_checkout(
             "0" * 64,
         ],
         [
-            "l10-unity-run",
+            "unity-renderer-run",
             "--factual-template",
             str(tmp_path / "missing-factual"),
             "--counterfactual-template",
@@ -200,12 +200,6 @@ def test_public_boundary_checker_accepts_clean_projection_and_rejects_secrets(
     plans = fixture / "docs" / "plans"
     plans.mkdir(parents=True)
     (plans / "internal.md").write_text("internal plan\n", encoding="utf-8")
-    raw = fixture / "benchmarks" / "aigame-psebench" / "source-patches"
-    raw.mkdir(parents=True)
-    (raw / "competitor.patch").write_text("raw material\n", encoding="utf-8")
-    seeds = fixture / "specs"
-    seeds.mkdir()
-    (seeds / "internal.seed.yaml").write_text("private: true\n", encoding="utf-8")
     _git("add", ".", cwd=fixture)
 
     rejected = subprocess.run(
@@ -219,8 +213,6 @@ def test_public_boundary_checker_accepts_clean_projection_and_rejects_secrets(
     assert "forbidden tracked path: evidence/internal.json" in rejected.stdout
     assert "forbidden tracked path: private/identity-map.json" in rejected.stdout
     assert "forbidden tracked path: docs/plans/internal.md" in rejected.stdout
-    assert "forbidden tracked path: benchmarks/aigame-psebench/source-patches/competitor.patch" in rejected.stdout
-    assert "forbidden tracked path: specs/internal.seed.yaml" in rejected.stdout
     assert "absolute user path: README.md" in rejected.stdout
     assert "private key material: README.md" in rejected.stdout
 

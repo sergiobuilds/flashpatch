@@ -256,18 +256,18 @@ def main() -> None:
     safety_demo.add_argument("--json", action="store_true", dest="json_output")
     godot_demo = subparsers.add_parser(
         "godot-demo",
-        help="run the submission Godot project through render, patch, replay, and evidence export",
+        help="run the included Godot project through render, patch, replay, and proof export",
     )
     godot_demo.add_argument(
         "--project",
         type=Path,
-        default=Path("benchmarks/aigame-psebench/corpus/interaction-burst"),
+        default=Path("examples/godot/interaction-burst"),
     )
     godot_demo.add_argument(
         "--contract",
         type=Path,
         default=Path(
-            "benchmarks/aigame-psebench/corpus/interaction-burst/"
+            "examples/godot/interaction-burst/"
             "flashpatch.renderer.contract.json"
         ),
     )
@@ -295,35 +295,35 @@ def main() -> None:
     )
     unity_preflight.add_argument("manifest", type=Path)
     unity_preflight.add_argument("project", type=Path)
-    l10_verify = subparsers.add_parser(
-        "l10-verify",
-        help="re-open a fail-closed L10 engine receipt or three-engine bundle",
+    engine_verify = subparsers.add_parser(
+        "verify-engine-proof",
+        help="re-open a fail-closed engine receipt or three-engine bundle",
     )
-    l10_verify.add_argument("input", type=Path)
-    l10_verify.add_argument("--bundle", action="store_true")
-    l10_verify.add_argument("--trust-policy", type=Path, required=True)
-    l10_verify.add_argument("--expected-trust-policy-sha256", required=True)
-    l10_unity_run = subparsers.add_parser(
-        "l10-unity-run",
-        help="run the frozen eight-execution Unity L10 matrix on one idle GPU",
+    engine_verify.add_argument("input", type=Path)
+    engine_verify.add_argument("--bundle", action="store_true")
+    engine_verify.add_argument("--trust-policy", type=Path, required=True)
+    engine_verify.add_argument("--expected-trust-policy-sha256", required=True)
+    unity_renderer_run = subparsers.add_parser(
+        "unity-renderer-run",
+        help="run the frozen eight-execution Unity renderer matrix on one idle GPU",
     )
-    l10_unity_run.add_argument("--factual-template", type=Path, required=True)
-    l10_unity_run.add_argument("--counterfactual-template", type=Path, required=True)
-    l10_unity_run.add_argument("--factual-manifest", type=Path, required=True)
-    l10_unity_run.add_argument("--counterfactual-manifest", type=Path, required=True)
-    l10_unity_run.add_argument("--runtime-output", type=Path, required=True)
-    l10_unity_run.add_argument("--entitlement", type=Path, required=True)
-    l10_unity_run.add_argument("--vulkan-loader", type=Path, required=True)
-    l10_unity_run.add_argument("--gpu-index", type=int, required=True)
-    l10_unity_run.add_argument("--display", required=True)
-    l10_unity_run.add_argument("--timeout-seconds", type=int, default=1800)
+    unity_renderer_run.add_argument("--factual-template", type=Path, required=True)
+    unity_renderer_run.add_argument("--counterfactual-template", type=Path, required=True)
+    unity_renderer_run.add_argument("--factual-manifest", type=Path, required=True)
+    unity_renderer_run.add_argument("--counterfactual-manifest", type=Path, required=True)
+    unity_renderer_run.add_argument("--runtime-output", type=Path, required=True)
+    unity_renderer_run.add_argument("--entitlement", type=Path, required=True)
+    unity_renderer_run.add_argument("--vulkan-loader", type=Path, required=True)
+    unity_renderer_run.add_argument("--gpu-index", type=int, required=True)
+    unity_renderer_run.add_argument("--display", required=True)
+    unity_renderer_run.add_argument("--timeout-seconds", type=int, default=1800)
     repair = subparsers.add_parser("repair", help="repair an MP4 file and write a receipt")
     repair.add_argument("input", type=Path)
     repair.add_argument("output", type=Path)
     repair.add_argument("--receipt", type=Path, required=True)
     verify = subparsers.add_parser("verify", help="verify an MP4 file")
     verify.add_argument("input", type=Path)
-    web = subparsers.add_parser("web", help="serve the judge-visible browser demo")
+    web = subparsers.add_parser("web", help="serve the local browser demo")
     web.add_argument("--host", default="127.0.0.1")
     web.add_argument("--port", type=int, default=8080)
     web.add_argument("--workspace", type=Path, default=Path("artifacts/web"))
@@ -392,7 +392,7 @@ def main() -> None:
         except (OSError, UnityPreflightError) as exc:
             print(json.dumps({"verdict": "INCONCLUSIVE", "reason": str(exc)}, sort_keys=True))
             raise SystemExit(2) from exc
-    elif args.command == "l10-verify":
+    elif args.command == "verify-engine-proof":
         from .l10_receipt import L10ReceiptError, verify_l10_bundle, verify_l10_receipt
 
         try:
@@ -415,7 +415,7 @@ def main() -> None:
         except (OSError, L10ReceiptError) as exc:
             print(json.dumps({"verified": False, "verdict": "INCONCLUSIVE", "reason": str(exc)}, sort_keys=True))
             raise SystemExit(2) from exc
-    elif args.command == "l10-unity-run":
+    elif args.command == "unity-renderer-run":
         from .l10_unity_runner import UnityL10RunError, run_unity_l10_matrix
 
         try:

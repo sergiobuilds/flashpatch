@@ -1,6 +1,0 @@
-{
-  "built_at": "2026-08-04T04:39:00Z",
-  "competition_py_sha256": "5d5cf621c4ea76c1a161dc6fba9e28b2f14028328f47acd5b46f1f8833ae30a9",
-  "schema": "flashpatch-l7-gold-verifier-build-v1",
-  "verifier_source_commit": "cc64ad92394d269e9242c2e22e63655deab7aab8"
-}

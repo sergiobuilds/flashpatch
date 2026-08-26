@@ -30,7 +30,7 @@ from flashpatch.safety_ci import (
 
 
 ROOT = Path(__file__).parents[1]
-SMOKE_PROJECT = ROOT / "benchmarks" / "aigame-psebench" / "corpus" / "interaction-burst"
+SMOKE_PROJECT = ROOT / "examples" / "godot" / "interaction-burst"
 SMOKE_CONTRACT = SMOKE_PROJECT / "flashpatch.contract.json"
 
 

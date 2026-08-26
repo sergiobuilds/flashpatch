@@ -7,8 +7,8 @@ FlashPatch accepts changes that improve reproducible visual-risk detection, sour
 ## 2 Development setup
 
 ```bash
-git clone https://github.com/sergiobuilds/flashpatch-public.git
-cd flashpatch-public
+git clone https://github.com/sergiobuilds/flashpatch.git
+cd flashpatch
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ".[dev]"

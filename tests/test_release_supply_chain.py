@@ -106,7 +106,7 @@ def test_release_bundle_is_licensed_reproducible_and_hash_verified(tmp_path: Pat
     )
     for command in (
         [
-            "l10-verify",
+            "verify-engine-proof",
             str(tmp_path / "missing-receipt.json"),
             "--trust-policy",
             str(tmp_path / "missing-policy.json"),
@@ -114,7 +114,7 @@ def test_release_bundle_is_licensed_reproducible_and_hash_verified(tmp_path: Pat
             "0" * 64,
         ],
         [
-            "l10-unity-run",
+            "unity-renderer-run",
             "--factual-template",
             str(tmp_path / "missing-factual"),
             "--counterfactual-template",

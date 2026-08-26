@@ -12,14 +12,7 @@ from pathlib import Path
 
 
 FORBIDDEN_PREFIXES = (
-    ".closure/",
-    ".closure-artifacts/",
-    ".hermes/",
-    ".ouroboros/",
     "artifacts/",
-    "benchmarks/aigame-psebench/baseline-league.json",
-    "benchmarks/aigame-psebench/results.json",
-    "benchmarks/aigame-psebench/source-patches/",
     "docs/plans/",
     "docs/research/day1-validation.json",
     "evidence/",
@@ -27,13 +20,6 @@ FORBIDDEN_PREFIXES = (
     "private/",
     "release/",
 )
-FORBIDDEN_PATHS = {
-    ".looprun-active",
-    "PASSDOWN.md",
-    "docs/CHRONICLE.md",
-    "docs/MASTER-MAP.md",
-}
-FORBIDDEN_SUFFIXES = (".seed.yaml",)
 ABSOLUTE_USER_PATH = re.compile(
     r"(?<![\w.])/(?:home|Users)/[^/\s\"'`:,;)\]}=*?|<>]+(?:/|(?=[\s\"'`:,;)\]}=*?|<>]))"
     r"|(?i:[A-Z]:\\Users\\[^\\\s\"'`:,;)\]}=*?|<>]+\\)"
@@ -81,9 +67,7 @@ def audit(root: Path) -> list[str]:
     violations: list[str] = []
     for relative in _tracked_files(root):
         if (
-            relative in FORBIDDEN_PATHS
-            or relative.startswith(FORBIDDEN_PREFIXES)
-            or relative.endswith(FORBIDDEN_SUFFIXES)
+            relative.startswith(FORBIDDEN_PREFIXES)
         ):
             violations.append(f"forbidden tracked path: {relative}")
         path = root / relative

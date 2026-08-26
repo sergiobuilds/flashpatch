@@ -15,9 +15,9 @@ from flashpatch.submission_demo import (
 
 
 ROOT = Path(__file__).parents[1]
-PROJECT = ROOT / "benchmarks" / "aigame-psebench" / "corpus" / "interaction-burst"
+PROJECT = ROOT / "examples" / "godot" / "interaction-burst"
 CONTRACT = PROJECT / "flashpatch.renderer.contract.json"
-GOLDEN_DEMO = ROOT / "benchmarks" / "godot-demo"
+GOLDEN_DEMO = ROOT / "proof" / "godot-demo"
 
 
 def _fake_pass_engine(tmp_path: Path) -> dict[str, object]:
@@ -163,6 +163,6 @@ def test_checked_in_godot_demo_is_self_verifying_and_public_safe() -> None:
     assert verification["hazard_before"] == 5.0
     assert verification["hazard_after"] == 0.0
     assert "/home/" not in engine_receipt
-    assert "benchmarks/godot-demo/comparison.png" in readme
-    assert "flashpatch verify-godot-demo benchmarks/godot-demo/receipt.json" in readme
-    assert "3/3" in readme
+    assert "proof/godot-demo/comparison.png" in readme
+    assert "flashpatch verify-godot-demo proof/godot-demo/receipt.json" in readme
+    assert "5.0 → 0.0" in readme
