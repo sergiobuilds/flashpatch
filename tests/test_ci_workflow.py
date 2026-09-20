@@ -8,12 +8,11 @@ WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
 SETUP_UV = (
     "uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d"
 )
-BUBBLEWRAP_PIN = "bubblewrap=0.9.0-1ubuntu0.1"
 UV_DEPENDENT_COMMANDS = (
     'GODOT_BINARY="$PWD/.tools/godot" python -m pytest -q -rs',
 )
 EXPECTED_SHARED_WORKFLOW_SHA256 = (
-    "c5dec25e696d43213fbf213644d264aab48f9e83307dd6fa0351c1f1cb56af5c"
+    "23faafebe24a6ac5ed972ab8719322cb5afc01b40f9a2ae1bb8ecb39c2929e05"
 )
 
 
@@ -34,5 +33,8 @@ def test_ci_installs_exact_bubblewrap_before_full_regression() -> None:
     workflow = WORKFLOW.read_text(encoding="utf-8")
     full_regression = UV_DEPENDENT_COMMANDS[0]
 
-    assert workflow.count(BUBBLEWRAP_PIN) == 1
-    assert workflow.index(BUBBLEWRAP_PIN) < workflow.index(full_regression)
+    assert 'bubblewrap_version="$(apt-cache policy bubblewrap | awk' in workflow
+    assert 'ffmpeg_version="$(apt-cache policy ffmpeg | awk' in workflow
+    assert '"bubblewrap=$bubblewrap_version"' in workflow
+    assert '"ffmpeg=$ffmpeg_version"' in workflow
+    assert workflow.index("bubblewrap_version=") < workflow.index(full_regression)
