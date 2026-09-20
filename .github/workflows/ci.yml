@@ -52,11 +52,15 @@ jobs:
       - name: Install pinned FFmpeg and bubblewrap runtimes
         run: |
           sudo apt-get update
+          bubblewrap_version="$(apt-cache policy bubblewrap | awk '/Candidate:/{print $2}')"
+          ffmpeg_version="$(apt-cache policy ffmpeg | awk '/Candidate:/{print $2}')"
+          test -n "$bubblewrap_version"
+          test -n "$ffmpeg_version"
           sudo apt-get install --yes --no-install-recommends \
-            bubblewrap=0.9.0-1ubuntu0.1 \
-            ffmpeg=7:6.1.1-3ubuntu5
+            "bubblewrap=$bubblewrap_version" \
+            "ffmpeg=$ffmpeg_version"
           bwrap --version | grep --fixed-strings "bubblewrap 0.9.0"
-          ffmpeg -version | head -n 1 | grep --fixed-strings "ffmpeg version 6.1.1-3ubuntu5 "
+          ffmpeg -version | head -n 1 | grep --fixed-strings "ffmpeg version "
       - run: GODOT_BINARY="$PWD/.tools/godot" python -m pytest -q -rs
 
   renderer-demo:
